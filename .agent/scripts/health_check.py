@@ -181,13 +181,27 @@ def check_memory(project_path=None):
             "level": "OK", "fix": "", "code": "MEM_OK"
         })
 
-    # Verificar .gitignore
+    # Verificar e auto-corrigir .gitignore
     gitignore = os.path.join(project_path, ".gitignore")
     if os.path.isfile(gitignore):
         with open(gitignore, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
         if ".agent/memory" not in content and ".agent/" not in content:
-            results.append(translate_error("GITIGNORE_MISSING"))
+            with open(gitignore, "a", encoding="utf-8") as f:
+                f.write("\n# IA Admin Toolkit - Isolamento de Memoria\n.agent/memory/\n")
+            results.append({
+                "human": ".agent/memory/ auto-adicionado ao .gitignore para segurança.",
+                "ai": "[OK]:.gitignore_auto_fixed.",
+                "level": "OK", "fix": "", "code": "GITIGNORE_FIXED"
+            })
+    else:
+        with open(gitignore, "w", encoding="utf-8") as f:
+            f.write("# IA Admin Toolkit - Isolamento de Memoria\n.agent/memory/\n")
+        results.append({
+            "human": ".gitignore criado automaticamente para proteger a memória.",
+            "ai": "[OK]:.gitignore_created.",
+            "level": "OK", "fix": "", "code": "GITIGNORE_CREATED"
+        })
     return results
 
 # ── Exibição Visual (Boot Sequence) ──────────────────────────

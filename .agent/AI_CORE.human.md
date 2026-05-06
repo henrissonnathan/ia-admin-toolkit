@@ -30,6 +30,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
 | 15 | `LAZY_SKILL` | **Ativação Dinâmica.** Só leia a skill específica da tarefa que está fazendo. Nunca leia todas as skills de uma vez. |
 | 16 | `RESUME` | **Restaurar Contexto.** Ao iniciar chat, leia o histórico (HISTORY.min.log) e o mapa (CONTEXT_MAP.min.txt) para lembrar onde parou. |
+| 17 | `AUTO_EVOLVE` | **Auto-Melhoria.** Se achar um padrão valioso ou corrigir erro complexo, use `L.evoluir [skill]` para editar a skill e deixá-la mais inteligente. |
 
 ---
 

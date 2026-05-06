@@ -29,10 +29,12 @@ O Mapa de Contexto nunca deve ser escrito em texto longo (linguagem humana).
 
 ## ⌨️ Comandos Rápidos (Shortcuts)
 Para economizar tempo e padronizar as ações, você pode usar os seguintes atalhos diretamente no chat:
+* **`L.cmd`** ➔ Lista todos os comandos rápidos do Toolkit para você não esquecer.
 * **`L.lista`** ➔ A IA lê o `IDEIAS_SUGERIDAS.md` e lista as ideias pendentes com seus IDs.
 * **`L.aprovar [ID-XXX]`** ➔ A IA executa imediatamente a ideia solicitada.
 * **`L.limpo`** ➔ A IA faz uma "faxina" no `ERROR_VAULT.md`, apagando erros que já não fazem mais sentido.
 * **`L.mapa`** ➔ A IA relê a estrutura e atualiza o `CONTEXT_MAP.min.txt`.
+* **`L.evoluir [skill]`** ➔ A IA analisa o que aprendeu de novo e atualiza o `SKILL.min.txt` da skill para ela ficar mais inteligente.
 
 ---
 
