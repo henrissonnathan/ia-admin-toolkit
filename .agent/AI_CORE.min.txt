@@ -8,3 +8,5 @@
 7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md. print="***IDEIAS_PENDENTES".
 8.TKN_SVR: short_ans. snippet_only. !expl unless req.
 9.TOOLKIT: use(C:\xampp\htdocs\ia-admin-toolkit) 4 tests.
+10.OUT_MIN: AI_reply_in_shorthand. !verbose.
+11.RESP_FMT: "PLAN: 1.[file]: action. 2.[file]: action". "OK" if done.
