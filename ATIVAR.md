@@ -20,6 +20,13 @@ A partir de agora, siga as regras do AI_CORE.min.txt em TODAS as suas respostas.
 Regras: C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt — siga estritamente.
 ```
 
+## Versão para Continuar (Novo Chat no mesmo projeto)
+
+```text
+Regras: C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt
+Comando: Execute a regra 16 (RESUME) lendo o HISTORY.min.log e CONTEXT_MAP.min.txt para recuperar o contexto de onde paramos.
+```
+
 ## Versão para Outro PC (Caminho genérico)
 
 ```

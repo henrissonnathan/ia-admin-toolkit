@@ -28,6 +28,8 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 12 | `CTX_MAP` | **Mapa de Contexto.** Leia `.agent/memory/CONTEXT_MAP.min.txt` antes de trabalhar. Atualize após modificar. |
 | 13 | `DUAL_SAVE` | **Salvamento Duplo.** Sempre salve em 2 formatos: `.human.md` (para você ler) e `.min.txt` (para a IA ler rápido). |
 | 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
+| 15 | `LAZY_SKILL` | **Ativação Dinâmica.** Só leia a skill específica da tarefa que está fazendo. Nunca leia todas as skills de uma vez. |
+| 16 | `RESUME` | **Restaurar Contexto.** Ao iniciar chat, leia o histórico (HISTORY.min.log) e o mapa (CONTEXT_MAP.min.txt) para lembrar onde parou. |
 
 ---
 

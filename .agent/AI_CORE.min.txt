@@ -12,4 +12,5 @@
 11.RESP_FMT: "PLN:1.[f]:act.2.[f]:act"."OK"if done.
 12.CTX_MAP: rd(.agent/memory/CONTEXT_MAP.min.txt) b4 any_work. update after mod.
 13.DUAL_SAVE: save(*.human.md + *.min.txt) always. human=readable. min=AI_only.
-14.INIT: on_clone->run(/smart-init)->create(memory/)+verify(skills/)+merge(rules).
+15.LAZY_SKILL: b4 task->find_relevant_skill_in(.agent/skills/)->rd(SKILL.min.txt). !load_all.
+16.RESUME: on_new_chat->rd(memory/HISTORY.min.log)+rd(memory/CONTEXT_MAP.min.txt) to restore context.

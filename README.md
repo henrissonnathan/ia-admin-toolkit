@@ -35,6 +35,8 @@ Reporte o resultado.
 | **Cofre de Erros** | Todos os erros resolvidos ficam catalogados para a IA nunca repetir o mesmo erro |
 | **Cofre de Ideias** | A IA guarda ideias sem executá-las. Você decide o que fazer |
 | **Economia de Tokens** | Regras minificadas que a IA lê em ~100 tokens (vs ~1500 no formato normal) |
+| **Auto-Resume** | Ao iniciar novo chat, a IA lê o histórico e o mapa de contexto para lembrar onde parou |
+| **Lazy Loading** | A IA lê apenas o `.min.txt` da skill necessária, nunca o diretório inteiro |
 | **Formato Dual** | Todo arquivo existe em 2 versões: `.human.md` (para você) e `.min.txt` (para a IA) |
 | **Health Check** | Script Python que verifica se tudo está configurado corretamente |
 | **Anti-Renomeação** | A IA não pode renomear variáveis ou funções sem sua permissão |
