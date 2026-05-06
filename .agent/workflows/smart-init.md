@@ -1,19 +1,34 @@
 # /smart-init
 
-**Descrição:** Protocolo de inicialização inteligente. Sincroniza regras (Pilares) entre o Cinto de Utilidades e o Projeto Local, e cria a estrutura de Memória Privada para economia de tokens.
-
-## Fase 1: Fusão de Pilares (Rule Merge)
-1. Ao ser executado, a IA deve ler os arquivos de regras (`GEMINI.md` ou regras soltas) do projeto atual.
-2. Em seguida, a IA lê as regras de Governança do `ia-admin-toolkit`.
-3. **Análise Crítica:** A IA compara os pilares (ex: P0 a P14). Se o projeto atual tiver regras diferentes ou específicas, a IA **não sobrescreve cegamente**. Ela faz uma **Fusão (Merge)**, adicionando o que falta do toolkit e melhorando o que já existe no projeto, criando um Super-Arquivo de regras.
-
-## Fase 2: Instalação da Memória Local (Token Saver Vault)
-1. A IA deve verificar a existência da pasta `.agent/memory/` na raiz do projeto.
-2. Se não existir, a IA cria a pasta e garante que a regra `.agent/memory/` seja adicionada ao arquivo `.gitignore` do projeto principal.
-3. **O cofre é isolado:** Esta pasta NUNCA vai para o GitHub do cliente. É uma memória exclusiva local.
-
-## Fase 3: Mapeamento Contínuo (Auto-Tracker)
-1. A partir deste momento, **cada ação, script ou alteração** feita pela IA deve ser resumida em 2 linhas e salva no arquivo `.agent/memory/HISTORY.json` ou `.md`.
-2. Quando uma nova conversa começar, a IA deve **ler SOMENTE o arquivo de memória** para se contextualizar. Isso elimina a necessidade de ler arquivos de código enormes, poupando milhares de tokens.
+**Descrição:** Protocolo de inicialização automática. Quando o toolkit é clonado ou baixado pela primeira vez, este workflow garante que tudo funcione sem erros e já configure a economia de tokens.
 
 // turbo-all
+
+## Fase 1: Criação da Estrutura de Memória
+1. Verificar se `.agent/memory/` existe no projeto atual.
+2. Se não existir, criar automaticamente:
+   - `.agent/memory/ERROR_VAULT.md` (vazio, com cabeçalho)
+   - `.agent/memory/IDEIAS_SUGERIDAS.md` (vazio, com cabeçalho)
+   - `.agent/memory/HISTORY.min.log` (vazio)
+   - `.agent/memory/CONTEXT_MAP.min.txt` (vazio, com template)
+3. Garantir que `.agent/memory/` esteja no `.gitignore` do projeto.
+
+## Fase 2: Verificação de Skills
+1. Ler a lista de skills em `.agent/skills/`.
+2. Para cada skill, verificar se possui **dois arquivos**:
+   - `SKILL.md` (versão humana completa)
+   - `SKILL.min.txt` (versão minificada para IA)
+3. Se `SKILL.min.txt` não existir, a IA deve criá-lo automaticamente a partir do `SKILL.md`.
+
+## Fase 3: Fusão de Regras (Rule Merge)
+1. Ler `AI_CORE.min.txt` do toolkit.
+2. Ler `GEMINI.md` ou regras do projeto atual.
+3. Comparar: Se o projeto tiver regras específicas, **não sobrescrever**. Fazer merge, adicionando o que falta.
+
+## Fase 4: Verificação Final (Health Check)
+1. Confirmar que todos os arquivos de memória existem.
+2. Confirmar que todas as skills possuem versão `.min.txt`.
+3. Imprimir relatório em formato duplo:
+   - **Humano:** `INIT_REPORT.human.md` (tabela legível)
+   - **IA:** `INIT_REPORT.min.txt` (shorthand ultra-compacto)
+4. Salvar os relatórios em `.agent/memory/`.

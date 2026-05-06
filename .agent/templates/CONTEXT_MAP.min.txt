@@ -1,0 +1,3 @@
+[CTX:EMPTY]
+# Gerado por /smart-init. Atualizar após cada modificação.
+# FMT: [module]:[file]:[functions]:[risk:L|H]

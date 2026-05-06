@@ -1,0 +1,11 @@
+[HEAL:v2]
+1.PLN_1ST: !ACT->req(PLN)->wait(USR_AUTH:"ok"|"autorizado"|"pode seguir").
+2.CHK_EXIST: !create(new_skill) if exists. update only.
+3.CONC_MEM: append_only(.agent/memory/*). !overwrite. !rewrite_full.
+4.ERR_VLT: on_fix(critical)->append(.agent/memory/ERROR_VAULT.md,"[E]:{s}|[C]:{c}|[S]:{f}"). rd(VAULT) b4 fix_attempt.
+5.RSK_LVL: eval(file_impact). LOW=isolated. HIGH=shared. if(HIGH)->iso_mod->!mod_core.
+6.IDA_VLT: !exe_idea. append(.agent/memory/IDEIAS_SUGERIDAS.md). print="***IDEIAS_PENDENTES".
+7.NO_REN: !ren(var|func|id|file) unless USR_CMD|FATAL.
+8.DEAD_CD: !rm(legacy|dead_code) unless PLN+USR_AUTH.
+9.DUAL_FMT: save(*.human.md+*.min.txt). human=USR_read. min=AI_read.
+10.CTX_TRACK: on_mod->append(.agent/memory/HISTORY.min.log,"[ts]:[file]:[what]:[why]").

@@ -1,33 +1,43 @@
-# 🤖 TRPROC_GOV: Manual Humano (Tradução do AI_CORE.min)
+# 🤖 TRPROC_GOV v2: Manual Humano (Tradução do AI_CORE.min)
 
-Este arquivo é a tradução legível para humanos das regras ofuscadas do `AI_CORE.min.txt`. 
-As regras no arquivo `.min.txt` custam cerca de 80 tokens, enquanto esta explicação custaria quase 1000 tokens para a IA ler a cada interação. Para economizar dinheiro na API do Claude/OpenAI, sempre mande a IA ler o `.min.txt`.
+Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
+**Para a IA:** Sempre leia o `.min.txt` (custa ~100 tokens). Este `.human.md` custa ~1500 tokens e é só para humanos consultarem.
 
-## O que significam os códigos no `AI_CORE.min.txt`?
+---
 
-1. **`1.PLN_1ST: !ACT. req(PLN). wait(USR_AUTH).`**
-   - **Tradução:** "Regra 1: Plano Primeiro. Não aja (!ACT). Requeira um plano. Espere a autorização do usuário." A IA não faz nada sem você mandar.
+## Regras 1-8 (Originais)
 
-2. **`2.RSK_EVAL: if(RSK==HIGH)->!mod_core->iso_mod.`**
-   - **Tradução:** "Regra 2: Avaliação de Risco. Se o risco for Alto, não modifique o código central. Isole a modificação em um novo arquivo/lógica."
+| # | Código | Tradução |
+|---|--------|----------|
+| 1 | `PLN_1ST` | Plano Primeiro. Não aja sem apresentar plano e esperar autorização. |
+| 2 | `RSK_EVAL` | Avaliação de Risco. Se risco Alto → não mexa no arquivo central. Isole. |
+| 3 | `NO_REN` | Não Renomeie variáveis, funções ou arquivos sem ordem do usuário. |
+| 4 | `DEAD_CD` | Não delete código morto antigo sem autorização expressa. |
+| 5 | `ERR_VLT` | Cofre de Erros. Registre `Erro|Causa|Solução`. Leia o cofre antes de consertar. |
+| 6 | `MEM_CONC` | Memória Concorrente. Só adicione no final do arquivo (append). Nunca sobrescreva. |
+| 7 | `IDA_VLT` | Cofre de Ideias. Não execute ideias. Salve no arquivo. Imprima `***IDEIAS_PENDENTES`. |
+| 8 | `TKN_SVR` | Respostas curtas, só código necessário. Sem explicações longas. |
 
-3. **`3.NO_REN: !ren(var|func|file) unless USR_CMD|FATAL.`**
-   - **Tradução:** "Regra 3: Não Renomeie. Não altere nomes de variáveis, funções ou arquivos a menos que o usuário mande ou seja um erro fatal."
+## Regras 9-14 (Novas v2)
 
-4. **`4.DEAD_CD: !rm(dead_code) unless USR_AUTH.`**
-   - **Tradução:** "Regra 4: Código Morto. Não remova códigos velhos ou inúteis sem autorização expressa do usuário."
+| # | Código | Tradução |
+|---|--------|----------|
+| 9 | `TOOLKIT` | Use a pasta `ia-admin-toolkit` para testes e diagnósticos. |
+| 10 | `OUT_MIN` | IA responde em formato curto (shorthand). Sem textos longos. |
+| 11 | `RESP_FMT` | Formato de resposta: `PLN:1.[arquivo]:ação`. Diz "OK" quando acabou. |
+| 12 | `CTX_MAP` | **Mapa de Contexto.** Leia `.agent/memory/CONTEXT_MAP.min.txt` antes de trabalhar. Atualize após modificar. |
+| 13 | `DUAL_SAVE` | **Salvamento Duplo.** Sempre salve em 2 formatos: `.human.md` (para você ler) e `.min.txt` (para a IA ler rápido). |
+| 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
 
-5. **`5.ERR_VLT: log_err->.agent/memory/ERROR_VAULT.md(E|C|S). rd(VAULT) b4 fix.`**
-   - **Tradução:** "Regra 5: Cofre de Erros. Se resolver um erro, grave no formato Erro|Causa|Solução. A IA deve sempre ler o cofre antes de tentar consertar algo."
+---
 
-6. **`6.MEM_CONC: append_only(.agent/memory/HISTORY.min.log).`**
-   - **Tradução:** "Regra 6: Concorrência de Memória. Apenas adicione linhas no final do arquivo de histórico, nunca sobrescreva, para evitar que chats diferentes se destruam."
+## Como usar no dia-a-dia
 
-7. **`7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md. print="***IDEIAS_PENDENTES".`**
-   - **Tradução:** "Regra 7: Cofre de Ideias. Não execute ideias próprias. Salve no arquivo de ideias. E apenas imprima `***IDEIAS_PENDENTES` para o usuário, poupando tokens de explicação."
+**Para iniciar um chat econômico (Claude Opus 4.6):**
+> "Leia `C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt` e siga estritamente."
 
-8. **`8.TKN_SVR: short_ans. snippet_only. !expl unless req.`**
-   - **Tradução:** "Regra 8: Token Saver. Respostas curtas, apenas o código necessário. Sem explicações longas a menos que o usuário peça."
+**Para verificar o que foi feito:**
+> Abra `AI_CORE.human.md` (este arquivo) e consulte a tabela.
 
-9. **`9.TOOLKIT: use(C:\xampp\htdocs\ia-admin-toolkit) 4 tests.`**
-   - **Tradução:** "Regra 9: Toolkit. Todos os diagnósticos de peso devem ser feitos rodando os scripts desta pasta isolada."
+**Para ver ideias pendentes que a IA guardou:**
+> Abra `.agent/memory/IDEIAS_SUGERIDAS.md`

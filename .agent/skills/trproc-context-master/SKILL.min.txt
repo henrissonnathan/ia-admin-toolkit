@@ -1,0 +1,7 @@
+[CTX_MSTR:v2]
+1.MAP: rd(TECHNICAL_MAP.json) b4 any_work. run(context_generator.py) if(route|ctrl|JS) mod.
+2.DEV_LOG: append(DEVELOPMENT_LOG.md,"[date]:[WHAT]:[WHY]:[files]") per commit.
+3.TKN_ECO: !rd(full_file). rd(MAP)->view_file(StartLine,EndLine)->update(MAP).
+4.FUZZ: run(smart_fuzzer.py)->val(str_limit,spec_chars,null).
+5.ERR: !update(MAP) after struct_change == FATAL_GOV_ERR.
+6.DUAL: save(CONTEXT_MAP.min.txt + CONTEXT_MAP.human.md) in .agent/memory/.
