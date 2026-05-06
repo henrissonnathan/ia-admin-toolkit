@@ -23,8 +23,8 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | # | Código | Tradução |
 |---|--------|----------|
 | 9 | `TOOLKIT` | Use a pasta `ia-admin-toolkit` para testes e diagnósticos. |
-| 10 | `OUT_MIN` | Processamento interno em formato curto (shorthand), mas a mensagem final deve ser traduzida para o humano. |
-| 11 | `RESP_FMT` | Formato de resposta: Mostrar o plano em shorthand primeiro, depois dar a explicação/tradução amigável. Nunca responder só em código. |
+| 10 | `OUT_MIN` | **Economia Extrema de Tokens.** A IA deve responder APENAS em Shorthand, a menos que você peça explicitamente uma explicação. |
+| 11 | `RESP_FMT` | Formato restrito: `PLN:1.[arquivo]:ação. OK`. Proibido responder com textos longos nas operações padrão. |
 | 12 | `CTX_MAP` | **Mapa de Contexto (Nexus).** Formato shorthand obrigatório para economizar tokens da IA. |
 | 13 | `DUAL_SAVE` | **Salvamento Duplo.** Sempre salve em 2 formatos: `.human.md` (para você ler) e `.min.txt` (para a IA ler rápido). |
 | 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
@@ -32,7 +32,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 16 | `RESUME` | **Restaurar Contexto.** Ao iniciar chat, leia o histórico (HISTORY.min.log) e o mapa (CONTEXT_MAP.min.txt) para lembrar onde parou. |
 | 17 | `AUTO_EVOLVE` | **Auto-Melhoria.** Se achar um padrão valioso ou corrigir erro complexo, use `L.evoluir [skill]` para editar a skill e deixá-la mais inteligente. |
 | 18 | `NO_GIT` | **Git Controlado.** A IA é proibida de usar `git add`, `commit` ou `push` sem autorização expressa do usuário. |
-| 19 | `TRANSLATE_LAYER`| **Camada de Tradução Resiliente.** A IA ignora erros de digitação em português e foca na sua intenção. O processamento interno é em Shorthand, e a saída é traduzida para texto amigável. |
+| 19 | `TRANSLATE_LAYER`| **Camada de Entendimento.** A IA ignora erros de digitação em português, mas a saída deve ser em Shorthand para poupar seus tokens. |
 ---
 
 ## Como usar no dia-a-dia
