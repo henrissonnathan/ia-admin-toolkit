@@ -23,8 +23,8 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | # | Código | Tradução |
 |---|--------|----------|
 | 9 | `TOOLKIT` | Use a pasta `ia-admin-toolkit` para testes e diagnósticos. |
-| 10 | `OUT_MIN` | IA responde em formato curto (shorthand). Sem textos longos. |
-| 11 | `RESP_FMT` | Formato de resposta: `PLN:1.[arquivo]:ação`. Diz "OK" quando acabou. |
+| 10 | `OUT_MIN` | Processamento interno em formato curto (shorthand), mas a mensagem final deve ser traduzida para o humano. |
+| 11 | `RESP_FMT` | Formato de resposta: Mostrar o plano em shorthand primeiro, depois dar a explicação/tradução amigável. Nunca responder só em código. |
 | 12 | `CTX_MAP` | **Mapa de Contexto (Nexus).** Formato shorthand obrigatório para economizar tokens da IA. |
 | 13 | `DUAL_SAVE` | **Salvamento Duplo.** Sempre salve em 2 formatos: `.human.md` (para você ler) e `.min.txt` (para a IA ler rápido). |
 | 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
