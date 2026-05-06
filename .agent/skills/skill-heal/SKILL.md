@@ -18,12 +18,17 @@ Para evitar que múltiplos chats rodando ao mesmo tempo corrompam o JSON de mem�
 - A IA NUNCA reescreve um arquivo de memória inteiro. 
 - Em vez disso, a memória do projeto (`.agent/memory/`) usará a técnica de **Append-Only**. Os novos aprendizados e históricos serão adicionados no final do arquivo (como um log), garantindo que se dois chats operarem juntos, nenhum sobrescreve a memória do outro.
 
-## 3. Cofre de Erros Compactado (Error Vault)
-Sempre que a IA resolver um erro crítico (conflito de rota, erro 500 no Flask, falha de tabela), ela deve OBRIGATORIAMENTE cadastrar a solução no Cofre de Erros.
-- **Localização:** `.agent/memory/ERROR_VAULT.md`
-- **Formato Estrito e Compacto:**
-  `[ERRO]: {sintoma} | [CAUSA]: {motivo real} | [SOLUÇÃO]: {como consertar}`
-- Antes de tentar consertar um erro, a IA DEVE ler o `ERROR_VAULT.md` para ver se não é um problema recorrente que já foi resolvido no passado.
+## 3. Compressão Semântica e Memória Dupla (Token Saver Absoluto)
+Sempre que a IA resolver um erro crítico ou aprender uma nova regra, ela usará o **Sistema de Memória Dupla (Dual Memory)** para economizar a maior quantidade de tokens possível.
+
+1. **Memória para IA (`.agent/memory/ERROR_VAULT.ai`):**
+   - Um arquivo de texto ultra-compactado usando **Compressão Semântica**.
+   - Sintaxe matemática e abreviada, sem pronomes ou formatação bonita. Pode ser ilegível para humanos. 
+   - Exemplo: em vez de "O erro na rota X foi corrigido adicionando Y", a IA escreve: `ERR_RT[X]=>FIX(ADD_Y)`
+   - **Objetivo:** A IA consegue ler 500 erros gastando quase zero tokens e milissegundos de processamento. A IA SEMPRE lê este arquivo primeiro.
+
+2. **Memória para Humanos (`.agent/memory/ERROR_VAULT.human.md`):**
+   - Um log tradicional, bem escrito e fácil de ler, descrevendo o erro e a solução de forma clara. A IA NÃO deve ler este arquivo no dia a dia, ele serve apenas como um backup de leitura para os desenvolvedores humanos.
 
 ## 4. Avaliação de Risco (Risk-Level) e Isolamento
 A avaliação de risco serve para a IA calcular o **nível de cuidado** antes de tocar no código:
