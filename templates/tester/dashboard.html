@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRPROC - Centro de Testes Automatizados</title>
+    <link rel="icon" href="/static/img/logo-head-new.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#0f172a; --glass:rgba(30,41,59,.72); --glass-border:rgba(255,255,255,.08);
+            --primary:#3b82f6; --primary-h:#2563eb; --success:#10b981; --danger:#ef4444;
+            --warn:#f59e0b; --text:#f1f5f9; --muted:#94a3b8;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:var(--bg);
+            background-image:radial-gradient(at 0% 0%,rgba(59,130,246,.12) 0,transparent 55%),
+            radial-gradient(at 100% 100%,rgba(16,185,129,.08) 0,transparent 55%);
+            color:var(--text);min-height:100vh}
+
+        /* TOPBAR */
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 2rem;
+            background:rgba(15,23,42,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-border);
+            position:sticky;top:0;z-index:50}
+        .topbar-left{display:flex;align-items:center;gap:12px}
+        .topbar-left img{height:32px}
+        .topbar-left h1{font-size:1.15rem;background:linear-gradient(to right,#60a5fa,#34d399);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .topbar-right{display:flex;gap:10px}
+        .topbar-right a{font-size:.85rem;color:var(--muted);text-decoration:none;padding:6px 14px;
+            border:1px solid var(--glass-border);border-radius:6px;transition:all .2s}
+        .topbar-right a:hover{color:white;border-color:var(--primary)}
+
+        /* TABS */
+        .tabs{display:flex;gap:0;background:rgba(15,23,42,.7);border-bottom:1px solid var(--glass-border)}
+        .tab{padding:10px 24px;font-size:.9rem;font-weight:600;color:var(--muted);cursor:pointer;
+            border-bottom:3px solid transparent;transition:all .2s}
+        .tab:hover{color:white}
+        .tab.active{color:#60a5fa;border-bottom-color:#60a5fa}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+
+        /* RBAC BAR */
+        .rbac-bar{display:flex;align-items:center;gap:8px;padding:.6rem 2rem;
+            background:rgba(30,41,59,.5);border-bottom:1px solid var(--glass-border);flex-wrap:wrap}
+        .rbac-bar span{font-size:.8rem;color:var(--muted);margin-right:6px}
+        .rbac-chip{padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;
+            border:2px solid transparent;transition:all .2s;opacity:.55}
+        .rbac-chip:hover{opacity:.85}
+        .rbac-chip.active{opacity:1;border-color:white;transform:scale(1.05)}
+        .chip-admin{background:#7c3aed;color:white}
+        .chip-master{background:#2563eb;color:white}
+        .chip-tecnico{background:#0891b2;color:white}
+        .chip-secretario{background:#059669;color:white}
+        .chip-cliente{background:#d97706;color:white}
+        .rbac-status{margin-left:auto;font-size:.78rem;padding:4px 12px;border-radius:12px;
+            background:rgba(16,185,129,.15);color:#34d399}
+
+        /* LAYOUT */
+        .container{max-width:1060px;margin:0 auto;padding:1.5rem 2rem 3rem}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem}
+
+        /* CARDS */
+        .card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);
+            border-radius:14px;padding:1.4rem;transition:transform .2s,box-shadow .2s}
+        .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+        .card h3{font-size:1.1rem;margin-bottom:.8rem;padding-bottom:.6rem;border-bottom:1px solid var(--glass-border)}
+        .card p.desc{color:var(--muted);font-size:.85rem;margin-bottom:1.2rem;line-height:1.45}
+
+        /* BUTTONS */
+        button{width:100%;padding:.7rem;border:none;border-radius:8px;font-weight:600;font-size:.95rem;
+            cursor:pointer;transition:all .2s;margin-bottom:.6rem;color:white}
+        .btn-primary{background:var(--primary)}.btn-primary:hover{background:var(--primary-h)}
+        .btn-success{background:var(--success)}.btn-success:hover{background:#059669}
+        .btn-danger{background:var(--danger)}.btn-danger:hover{background:#dc2626}
+        .btn-warn{background:var(--warn)}.btn-warn:hover{background:#d97706}
+        .btn-sm{padding:.5rem .8rem;font-size:.8rem;width:auto;margin:0}
+
+        /* CONSOLE */
+        .console-wrap{background:#020617;border:1px solid var(--glass-border);border-radius:12px;overflow:hidden;margin-top:1.5rem}
+        .console-head{display:flex;justify-content:space-between;padding:.6rem 1rem;
+            background:rgba(30,41,59,.9);font-family:monospace;font-size:.82rem;color:var(--muted);
+            border-bottom:1px solid var(--glass-border)}
+        .console-head span:last-child{cursor:pointer}
+        .console-head span:last-child:hover{color:white}
+        .console-body{padding:1rem;height:260px;overflow-y:auto;font-family:'Consolas','Monaco',monospace;
+            font-size:.85rem;line-height:1.55}
+        .log-entry{margin-bottom:.35rem}
+        .log-info{color:#60a5fa}.log-success{color:#34d399}.log-error{color:#f87171}.log-system{color:#fbbf24}
+
+        /* UNIT TEST TABLE */
+        .ut-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:1rem}
+        .ut-table th{text-align:left;padding:8px 10px;background:rgba(30,41,59,.8);color:var(--muted);
+            font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--glass-border)}
+        .ut-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04)}
+        .ut-table tr:hover td{background:rgba(255,255,255,.03)}
+        .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:600}
+        .badge-pass{background:rgba(16,185,129,.2);color:#34d399}
+        .badge-fail{background:rgba(239,68,68,.2);color:#f87171}
+        .badge-pending{background:rgba(245,158,11,.2);color:#fbbf24}
+        .badge-role{background:rgba(124,58,237,.15);color:#a78bfa;margin-right:3px}
+
+        /* STATS ROW */
+        .stats{display:flex;gap:12px;margin-bottom:1.2rem;flex-wrap:wrap}
+        .stat-card{flex:1;min-width:120px;background:rgba(30,41,59,.5);border:1px solid var(--glass-border);
+            border-radius:10px;padding:12px;text-align:center}
+        .stat-card .num{font-size:1.6rem;font-weight:700}
+        .stat-card .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+        /* ═══ MODAL DE PROGRESSO ═══ */
+        .test-modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,.88);backdrop-filter:blur(8px);
+            z-index:9999;display:flex;align-items:center;justify-content:center;
+            opacity:0;pointer-events:none;transition:opacity .3s ease}
+        .test-modal-overlay.active{opacity:1;pointer-events:auto}
+        .test-modal{background:linear-gradient(135deg,rgba(30,41,59,.95),rgba(15,23,42,.98));
+            border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:2.5rem;
+            width:min(560px,92vw);box-shadow:0 25px 60px rgba(0,0,0,.5),0 0 80px rgba(59,130,246,.08);
+            transform:scale(.92);transition:transform .35s cubic-bezier(.175,.885,.32,1.275)}
+        .test-modal-overlay.active .test-modal{transform:scale(1)}
+        .tm-header{text-align:center;margin-bottom:1.8rem}
+        .tm-header h2{font-size:1.3rem;margin-bottom:.4rem;
+            background:linear-gradient(to right,#60a5fa,#a78bfa,#34d399);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .tm-header p{color:var(--muted);font-size:.85rem}
+        .tm-spinner{width:48px;height:48px;border:4px solid rgba(99,102,241,.15);
+            border-top-color:#6366f1;border-radius:50%;margin:0 auto 1rem;
+            animation:tm-spin 1s linear infinite}
+        @keyframes tm-spin{to{transform:rotate(360deg)}}
+        .tm-progress-wrap{background:rgba(255,255,255,.06);border-radius:10px;height:12px;
+            overflow:hidden;margin:1.2rem 0;position:relative}
+        .tm-progress-bar{height:100%;border-radius:10px;transition:width .5s ease;
+            background:linear-gradient(90deg,#3b82f6,#6366f1,#8b5cf6);
+            background-size:200% 100%;animation:tm-shimmer 2s ease infinite}
+        @keyframes tm-shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .tm-stats-row{display:flex;gap:10px;justify-content:center;margin:1rem 0}
+        .tm-stat{text-align:center;padding:8px 16px;background:rgba(255,255,255,.04);
+            border:1px solid var(--glass-border);border-radius:10px;min-width:80px}
+        .tm-stat .n{font-size:1.4rem;font-weight:700}
+        .tm-stat .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+        .tm-level-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;
+            border-radius:20px;font-weight:700;font-size:.9rem;margin:6px 0 12px;
+            animation:tm-pulse 2s ease-in-out infinite}
+        @keyframes tm-pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.4)}50%{box-shadow:0 0 0 12px rgba(99,102,241,0)}}
+        .tm-results-list{max-height:180px;overflow-y:auto;margin-top:1rem;font-size:.85rem}
+        .tm-result-row{display:flex;align-items:center;justify-content:space-between;
+            padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+        .tm-result-row:last-child{border-bottom:none}
+        .tm-done-icon{font-size:2.5rem;margin-bottom:.5rem;animation:tm-bounce .6s ease}
+        @keyframes tm-bounce{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <img src="/static/img/logo-trproc.png" alt="Logo" onerror="this.style.display='none'">
+        <h1>TRPROC Test Hub</h1>
+    </div>
+    <div class="topbar-right">
+        <a href="/">🌐 Site Normal</a>
+        <a href="/dev/tester">🔄 Recarregar</a>
+    </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+    <div class="tab active" id="btnTabSandbox" onclick="switchTab('sandbox')">📦 Sandbox & E2E</div>
+    <div class="tab" id="btnTabUnit" onclick="switchTab('unit')">🔬 Teste Geral</div>
+    <div class="tab" id="btnTabUnitario" onclick="switchTab('unitario')" style="color:#10b981">🧪 Testes Unitários</div>
+    <div class="tab" id="btnTabDebug" onclick="switchTab('debug')">🐞 Debug</div>
+    <div class="tab" id="btnTabIsolation" onclick="switchTab('isolation')" style="color:#0ea5e9">🔬 Isolamento</div>
+    <div class="tab" id="btnTabChaos" onclick="switchTab('chaos')">🌪️ Chaos</div>
+    <div class="tab" id="btnTabUiux" onclick="switchTab('uiux')">📱 UI/UX</div>
+    <div class="tab" id="btnTabEditor" onclick="switchTab('editor')" style="color:#60a5fa; font-weight:700">✍️ Editor de Testes</div>
+    <div class="tab" id="btnTabPerf" onclick="switchTab('perf')" style="color:#f59e0b">⚡ Perf</div>
+    <div class="tab" id="btnTabHeaders" onclick="switchTab('headers')" style="color:#a78bfa">🔒 Headers</div>
+    <div class="tab" id="btnTabIntegrity" onclick="switchTab('integrity')" style="color:#34d399">🗄️ Integridade</div>
+    <div class="tab" id="btnTabNuclear" data-scan-btn onclick="dispararNuclear()" style="color:#ef4444;margin-left:auto;border:1px solid rgba(239,68,68,.3);border-radius:6px 6px 0 0">☢️ NUCLEAR</div>
+</div>
+
+<!-- RBAC BAR -->
+<div class="rbac-bar">
+    <span>NÍVEL:</span>
+    <div class="rbac-chip chip-admin active" onclick="switchRole('admin',this)">👑 Admin</div>
+    <div class="rbac-chip chip-master" onclick="switchRole('master',this)">⚡ Master</div>
+    <div class="rbac-chip chip-tecnico" onclick="switchRole('tecnico',this)">🔧 Técnico</div>
+    <div class="rbac-chip chip-secretario" onclick="switchRole('secretario',this)">🏛 Secretário</div>
+    <div class="rbac-chip chip-cliente" onclick="switchRole('cliente',this)">👤 Cliente</div>
+    <div class="rbac-chip chip-todos" onclick="switchRole('todos',this)" style="background:#475569;color:white">🌐 Todos os Níveis</div>
+    <div class="rbac-status" id="rbacStatus">Ativo: Admin (acesso total)</div>
+</div>
+
+<!-- ═══════ TAB 1: SPIDER E2E & SANDBOX ═══════ -->
+<div class="tab-content active" id="tab-sandbox">
+    <div class="container">
+        <div class="grid">
+            <div class="card" style="border: 1px solid rgba(59,130,246,0.3)">
+                <h3 style="color:#60a5fa">🕷️ Autônomo Spider E2E</h3>
+                <p class="desc">Varre ativamente todas as rotas de PAGINAS_SISTEMA e detecta erros 500, 404, TemplateNotFound e MethodNotAllowed.</p>
+                <button class="btn-primary" data-scan-btn onclick="iniciarSpider()">▶ Iniciar Varredura Spider</button>
+            </div>
+            <div class="card">
+                <h3>📦 Massa de Dados (Sandbox)</h3>
+                <p class="desc">Injeta dados isolados para os testes E2E.</p>
+                <button class="btn-success" onclick="runAction('/dev/tester/api/generate-mock','Gerando massa de dados...')">Injetar Massa [TESTE]</button>
+                <button class="btn-danger" onclick="runAction('/dev/tester/api/cleanup-mock','Limpando dados [TESTE]...')">Limpar Dados</button>
+            </div>
+            <div class="card">
+                <h3>🔗 Acesso Rápido</h3>
+                <p class="desc">Health Check & Utils</p>
+                <button class="btn-success" onclick="window.open('/api/health','_blank')">💚 Health Check</button>
+            </div>
+        </div>
+        <div class="console-wrap">
+            <div class="console-head"><span>Terminal do Robô</span><span onclick="clearConsole()">🗑 Limpar</span></div>
+            <div class="console-body" id="consoleOutput">
+                <div class="log-entry log-system">Sistema Test Hub inicializado.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 2: TESTE GERAL ═══════ -->
+<div class="tab-content" id="tab-unit">
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats" id="utStats">
+            <div class="stat-card"><div class="num" id="statPaginas">-</div><div class="lbl">Páginas Mapeadas</div></div>
+            <div class="stat-card"><div class="num" id="statBotoes">-</div><div class="lbl">Botões Mapeados</div></div>
+            <div class="stat-card"><div class="num" id="statCampos">-</div><div class="lbl">Campos de Form</div></div>
+            <div class="stat-card"><div class="num" id="statModulos">-</div><div class="lbl">Módulos</div></div>
+        </div>
+
+        <!-- Ações -->
+        <div style="display:flex;gap:10px;margin-bottom:1.2rem;flex-wrap:wrap">
+            <button class="btn-success" data-scan-btn style="width:auto;padding:.7rem 1.5rem" onclick="executarTodosTestes()">
+                ▶ Executar TODOS os Testes (nível atual)
+            </button>
+            <button class="btn-primary" style="width:auto;padding:.7rem 1.5rem" onclick="carregarPaginas()">
+                🔄 Recarregar Lista de Páginas
+            </button>
+            <button class="btn-warn" style="width:auto;padding:.7rem 1.5rem" onclick="runAction('/dev/tester/api/unit/testar-monstro', 'Testando Motor Monstro (Simples e Mãe-Filha)...', {}, utOut)">
+                🧪 Testar Mapeamento de Tabela Monstro
+            </button>
+        </div>
+
+        <!-- Resultados Globais -->
+        <div id="utResultadoGlobal" style="display:none;margin-bottom:1rem;padding:12px 16px;border-radius:10px;
+            background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)">
+        </div>
+
+        <!-- Tabela de Páginas -->
+        <div class="card" style="overflow-x:auto">
+            <h3>📋 Páginas do Sistema</h3>
+            <table class="ut-table">
+                <thead>
+                    <tr>
+                        <th>Página</th>
+                        <th>Rota</th>
+                        <th>Módulo</th>
+                        <th>Botões</th>
+                        <th>Campos</th>
+                        <th>Níveis</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="utTableBody">
+                    <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">Carregando páginas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resultado Detalhado de Página Individual -->
+        <div id="utDetalhe" style="display:none;margin-top:1.2rem">
+            <div class="card">
+                <h3 id="utDetalheTitle">Resultado</h3>
+                <div id="utDetalheBody"></div>
+            </div>
+        </div>
+
+        <!-- Console de Testes Unitários -->
+        <div class="console-wrap">
+            <div class="console-head"><span>Terminal de Teste Geral</span><span onclick="clearUTConsole()">🗑 Limpar</span></div>
+            <div class="console-body" id="utConsole">
+                <div class="log-entry log-system">Motor de Testes Unitários carregado.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 3: TESTES UNITÁRIOS (NOVO - para o usuário adicionar testes específicos) ═══════ -->
+<div class="tab-content" id="tab-unitario">
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card"><div class="num" id="utNewTotal" style="color:#e2e8f0">0</div><div class="lbl">Testes Cadastrados</div></div>
+            <div class="stat-card"><div class="num" id="utNewPass" style="color:#34d399">0</div><div class="lbl">Passou</div></div>
+            <div class="stat-card"><div class="num" id="utNewFail" style="color:#f87171">0</div><div class="lbl">Falhou</div></div>
+            <div class="stat-card"><div class="num" id="utNewPending" style="color:#fbbf24">0</div><div class="lbl">Pendente</div></div>
+        </div>
+
+        <div class="card" style="border:1px solid rgba(16,185,129,.3)">
+            <h3 style="color:#10b981">🧪 Testes Unitários Personalizados</h3>
+            <p class="desc">Adicione testes específicos passo a passo. Cada teste é uma verificação isolada que você define com rota, ação esperada e resultado esperado.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                <div>
+                    <label for="utNewName" style="color:var(--muted);font-size:.82rem">Nome do Teste:</label>
+                    <input type="text" id="utNewName" placeholder="Ex: Login retorna 200" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                </div>
+                <div>
+                    <label for="utNewRota" style="color:var(--muted);font-size:.82rem">Rota a Testar:</label>
+                    <input type="text" id="utNewRota" placeholder="/dashboard, /login, /api/health" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+                <div>
+                    <label for="utNewMethod" style="color:var(--muted);font-size:.82rem">Método HTTP:</label>
+                    <select id="utNewMethod" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="utNewStatus" style="color:var(--muted);font-size:.82rem">Status Esperado:</label>
+                    <input type="number" id="utNewStatus" value="200" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                </div>
+                <div>
+                    <label for="utNewContains" style="color:var(--muted);font-size:.82rem">Contém no Body:</label>
+                    <input type="text" id="utNewContains" placeholder="Opcional: texto esperado" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                </div>
+            </div>
+            <div style="margin-bottom:16px">
+                <label for="utNewBody" style="color:var(--muted);font-size:.82rem">Corpo do Request (JSON, opcional):</label>
+                <textarea id="utNewBody" placeholder='{"campo": "valor"}' style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;min-height:60px;resize:vertical;font-family:monospace;margin-top:4px"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn-success" style="width:auto;padding:.7rem 1.5rem" onclick="adicionarTesteUnitario()">➕ Adicionar Teste</button>
+                <button class="btn-primary" data-scan-btn style="width:auto;padding:.7rem 1.5rem" onclick="executarTestesUnitarios()">▶ Executar Todos</button>
+                <button class="btn-warn" style="width:auto;padding:.7rem 1.5rem" onclick="limparTestesUnitarios()">🗑 Limpar Lista</button>
+            </div>
+        </div>
+
+        <!-- Lista de Testes Cadastrados -->
+        <div class="card" style="margin-top:1.2rem">
+            <h3>📋 Testes Cadastrados</h3>
+            <div id="utNewList" style="min-height:100px">
+                <p style="color:var(--muted);text-align:center;padding:2rem">Nenhum teste cadastrado ainda. Use o formulário acima para adicionar.</p>
+            </div>
+        </div>
+
+        <!-- Console -->
+        <div class="console-wrap" style="margin-top:1.2rem">
+            <div class="console-head"><span>Terminal de Testes Unitários</span><span onclick="document.getElementById('utNewConsole').innerHTML=''">🗑 Limpar</span></div>
+            <div class="console-body" id="utNewConsole">
+                <div class="log-entry log-system">Motor de Testes Unitários pronto. Adicione testes acima.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 4: DEBUG & SEGURANÇA ═══════ -->
+<div class="tab-content" id="tab-debug">
+    <div class="container">
+
+        <!-- ═══ PAINEL NUCLEAR (aparece quando rodando) ═══ -->
+        <div id="nuclearPanel" style="display:none;margin-bottom:1.5rem;background:linear-gradient(135deg,rgba(30,41,59,.95),rgba(15,23,42,.98));border:1px solid rgba(239,68,68,.3);border-radius:16px;padding:1.6rem;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.05)">
+                <div id="nuclearProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981);transition:width .5s ease"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+                <div id="nuclearSpinner" style="width:28px;height:28px;border:3px solid rgba(239,68,68,.2);border-top-color:#ef4444;border-radius:50%;animation:tm-spin 1s linear infinite"></div>
+                <div>
+                    <h3 style="margin:0;font-size:1.1rem;color:#f87171" id="nuclearTitle">☢️ Varredura Nuclear em Andamento</h3>
+                    <p style="margin:0;font-size:.82rem;color:var(--muted)" id="nuclearSubtitle">Inicializando...</p>
+                </div>
+                <div style="margin-left:auto;text-align:right">
+                    <div style="font-size:1.3rem;font-weight:700;color:#60a5fa" id="nuclearPct">0%</div>
+                    <div style="font-size:.72rem;color:var(--muted)" id="nuclearTimer">0s</div>
+                </div>
+            </div>
+            <div style="font-size:.85rem;color:#fbbf24;margin-bottom:1rem;padding:6px 12px;background:rgba(245,158,11,.08);border-radius:8px" id="nuclearStep">⏳ Preparando...</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="nuclearCards">
+                <div class="nuc-card" id="nucCard1" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;opacity:.4">
+                    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">🧪 Unitários</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin:4px 0" id="nucUnit">—</div>
+                    <div style="font-size:.7rem;color:var(--muted)" id="nucUnitDetail">Aguardando</div>
+                </div>
+                <div class="nuc-card" id="nucCard2" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;opacity:.4">
+                    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">⚡ Performance</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin:4px 0" id="nucPerf">—</div>
+                    <div style="font-size:.7rem;color:var(--muted)" id="nucPerfDetail">Aguardando</div>
+                </div>
+                <div class="nuc-card" id="nucCard3" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;opacity:.4">
+                    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">🔒 Headers</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin:4px 0" id="nucHdr">—</div>
+                    <div style="font-size:.7rem;color:var(--muted)" id="nucHdrDetail">Aguardando</div>
+                </div>
+                <div class="nuc-card" id="nucCard4" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;opacity:.4">
+                    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">🗄️ Integridade</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin:4px 0" id="nucInt">—</div>
+                    <div style="font-size:.7rem;color:var(--muted)" id="nucIntDetail">Aguardando</div>
+                </div>
+                <div class="nuc-card" id="nucCard5" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;opacity:.4">
+                    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">📱 UI/UX</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin:4px 0" id="nucUiux">—</div>
+                    <div style="font-size:.7rem;color:var(--muted)" id="nucUiuxDetail">Aguardando</div>
+                </div>
+            </div>
+            <!-- Nuclear Live Log Console -->
+            <div id="nuclearLogWrap" style="margin-top:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);border-radius:10px;max-height:280px;overflow-y:auto;padding:8px 12px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.73rem;line-height:1.5;display:none">
+                <div id="nuclearLogList" style="color:var(--muted)"></div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats" id="debugStats">
+            <div class="stat-card"><div class="num" id="dStatErros" style="color:#f87171">0</div><div class="lbl">Erros Capturados</div></div>
+            <div class="stat-card"><div class="num" id="dStatAmeacas" style="color:#fbbf24">0</div><div class="lbl">Ameaças Detectadas</div></div>
+            <div class="stat-card"><div class="num" id="dStatUltimo" style="color:#94a3b8;font-size:.9rem">—</div><div class="lbl">Último Erro</div></div>
+            <div class="stat-card"><div class="num" id="dStatUltimaAmeaca" style="color:#94a3b8;font-size:.9rem">—</div><div class="lbl">Última Ameaça</div></div>
+        </div>
+
+        <!-- Ações -->
+        <div style="display:flex;gap:10px;margin-bottom:1.2rem;flex-wrap:wrap">
+            <button class="btn-danger" style="width:auto;padding:.7rem 1.5rem" onclick="carregarDebug()">🔄 Atualizar Logs</button>
+            <button class="btn-warn" style="width:auto;padding:.7rem 1.5rem" onclick="baixarArquivoLogs()">📥 Exportar Logs de Erro</button>
+            <button class="btn-primary" style="width:auto;padding:.7rem 1.5rem" onclick="limparLogsDebug()">🗑 Limpar Todos os Logs</button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-left:auto">
+                <input type="checkbox" id="debugAutoRefresh" onchange="toggleAutoRefresh()" checked> Auto-refresh (5s)
+            </label>
+        </div>
+
+        <!-- Sub-tabs Debug -->
+        <div style="display:flex;gap:0;background:rgba(15,23,42,.7);border:1px solid var(--glass-border);border-radius:10px 10px 0 0;overflow:hidden;margin-top:.5rem">
+            <div class="tab active" onclick="switchDebugSub('erros')" id="dSubErros" style="flex:1;text-align:center">🐞 Erros do Sistema</div>
+            <div class="tab" onclick="switchDebugSub('ameacas')" id="dSubAmeacas" style="flex:1;text-align:center">🛡️ Ameaças & Ataques</div>
+            <div class="tab" onclick="switchDebugSub('falhas')" id="dSubFalhas" style="flex:1;text-align:center">📋 Falhas de Teste</div>
+        </div>
+
+        <!-- Sub-tab: Erros do Sistema -->
+        <div class="card" id="debugSubErros" style="border-radius:0 0 10px 10px;border-top:none">
+            <div id="debugErrosContainer" style="min-height:200px">
+                <p style="color:var(--muted);text-align:center;padding:2rem">Clique em "Atualizar Logs" para carregar os erros capturados.</p>
+            </div>
+        </div>
+
+        <!-- Sub-tab: Ameaças -->
+        <div class="card" id="debugSubAmeacas" style="border-radius:0 0 10px 10px;border-top:none;display:none">
+            <div id="debugAmeacasContainer" style="min-height:200px">
+                <p style="color:var(--muted);text-align:center;padding:2rem">Clique em "Atualizar Logs" para carregar as ameaças detectadas.</p>
+            </div>
+        </div>
+
+        <!-- Sub-tab: Falhas de Teste (do motor unitário) -->
+        <div class="card" id="debugSubFalhas" style="border-radius:0 0 10px 10px;border-top:none;display:none">
+            <div id="debugListContainer" style="min-height:200px">
+                <p style="color:var(--muted);text-align:center;padding:2rem">Execute os testes na aba "Testes Unitários" primeiro.</p>
+            </div>
+        </div>
+
+        <!-- Detalhe expandido de um erro -->
+        <div id="debugDetalheErro" class="card" style="display:none;margin-top:1rem;border:1px solid rgba(239,68,68,.3)">
+            <h3 style="color:#f87171">🔍 Detalhe do Erro</h3>
+            <div id="debugDetalheBody"></div>
+        </div>
+
+        <!-- Console de Debug (log em tempo real) -->
+        <div class="console-wrap" style="margin-top:1.2rem">
+            <div class="console-head"><span>Console de Debug</span><span onclick="clearDebugConsole()">🗑 Limpar</span></div>
+            <div class="console-body" id="debugConsole">
+                <div class="log-entry log-system">Motor de Debug inicializado. Capturando erros e ameaças em tempo real.</div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 4: ISOLAMENTO & TDD ═══════ -->
+<div class="tab-content" id="tab-isolation">
+    <div class="container">
+        <div class="grid">
+            <div class="card" style="border: 1px solid rgba(14,165,233,0.3)">
+                <h3 style="color:#0ea5e9">🔬 Playground de Reprodução</h3>
+                <p class="desc">Cole um erro capturado no sistema e descreva o passo-a-passo. A IA criará uma suíte de testes unitários isolada para reproduzir e resolver a falha sem afetar o banco principal.</p>
+                <div style="margin-bottom:12px">
+                    <label for="isoTitle" style="color:var(--muted);font-size:0.85rem">Título / Descrição Curta:</label>
+                    <input type="text" id="isoTitle" placeholder="Ex: Erro de máscara monetária ao salvar Form" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;margin-top:4px">
+                </div>
+                <div style="margin-bottom:12px">
+                    <label for="isoSteps" style="color:var(--muted);font-size:0.85rem">Passo a Passo (Como reproduzir):</label>
+                    <textarea id="isoSteps" placeholder="1. Acesse o painel...&#10;2. Clique em salvar..." style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white;min-height:80px;resize:vertical;font-family:inherit;margin-top:4px"></textarea>
+                </div>
+                <div style="margin-bottom:12px">
+                    <label for="isoError" style="color:var(--muted);font-size:0.85rem">Stacktrace ou Mensagem de Erro:</label>
+                    <textarea id="isoError" placeholder="Pode colar o erro do Python, PHP ou Console JS aqui..." style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:#f87171;font-family:monospace;min-height:100px;resize:vertical;margin-top:4px"></textarea>
+                </div>
+                <button class="btn-primary" style="background:#0ea5e9;margin-top:12px" onclick="iniciarIsolamento()">▶ Analisar e Criar Teste Isolado</button>
+            </div>
+            <div class="card">
+                <h3>💾 Acervo de Regressões</h3>
+                <p class="desc">Bugs que já foram analisados e salvos. Eles são validados automaticamente na Varredura Nuclear.</p>
+                <button class="btn-primary" onclick="carregarAcervoIsolamento()">🔄 Recarregar Acervo</button>
+                <div id="isoAcervoList" style="margin-top:1rem;font-size:0.85rem;color:var(--muted);max-height:300px;overflow-y:auto">
+                    <i>Nenhum erro salvo ainda no histórico json.</i>
+                </div>
+            </div>
+        </div>
+        <div class="console-wrap" style="margin-top:1.2rem">
+            <div class="console-head"><span>Terminal de Isolamento Assíncrono</span><span onclick="clearIsoConsole()">🗑 Limpar</span></div>
+            <div class="console-body" id="isoConsole">
+                <div class="log-entry log-system">Motor de Isolamento Inicializado. Pronto para TDD.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 5: CHAOS ENGINE ═══════ -->
+<div class="tab-content" id="tab-chaos">
+    <div class="container">
+        <div class="grid">
+            <div class="card" style="border: 1px solid rgba(248,113,113,0.3)">
+                <h3 style="color:#f87171">🌪️ Fuzzing E2E Massivo</h3>
+                <p class="desc">Bateria de testes assíncronos focada na resiliência do Banco (Pilar 13) e Race Conditions. Requer a injeção prévia da Massa de Testes.</p>
+                <div style="margin-bottom:12px">
+                    <label for="chaosThreads" style="color:var(--muted);font-size:0.85rem">Threads Simultâneas:</label>
+                    <input type="number" id="chaosThreads" value="10" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white">
+                </div>
+                <div style="margin-bottom:12px">
+                    <label for="chaosMsgs" style="color:var(--muted);font-size:0.85rem">Ações/Mensagens por Thread:</label>
+                    <input type="number" id="chaosMsgs" value="20" style="width:100%;padding:8px;border-radius:6px;background:#0f172a;border:1px solid var(--glass-border);color:white">
+                </div>
+                <button class="btn-danger" data-scan-btn style="margin-top:12px" onclick="iniciarChaosEngine()">Disparar Artilharia Chaos 🚀</button>
+            </div>
+            <div class="card">
+                <h3>📦 Instanciar Massa Sandbox</h3>
+                <p class="desc">Cria Municípios, Usuários, Admins e Processos massivamente com prefixo [TESTE].</p>
+                <button class="btn-primary" onclick="injetarMassaChaos()">Injetar Massa Escalada</button>
+                <button class="btn-warn" onclick="runAction('/dev/tester/api/chaos/limpar', 'Limpando banco [TESTE]...', {}, getChaosOut())">Limpar Tudo [TESTE]</button>
+            </div>
+        </div>
+        <div class="console-wrap" style="margin-top:1.2rem">
+            <div class="console-head"><span>Terminal Chaos</span><span onclick="clearChaosConsole()">🗑 Limpar</span></div>
+            <div class="console-body" id="chaosConsole">
+                <div class="log-entry log-system">Chaos Engine aguardando ordens.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 5: UI/UX & MOBILE ═══════ -->
+<div class="tab-content" id="tab-uiux">
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats" id="uiuxStats">
+            <div class="stat-card"><div class="num" id="uiTotal">-</div><div class="lbl">Rotas Testadas</div></div>
+            <div class="stat-card"><div class="num" style="color:#34d399" id="uiOk">-</div><div class="lbl">Responsivas</div></div>
+            <div class="stat-card"><div class="num" style="color:#f59e0b" id="uiWarn">-</div><div class="lbl">Alertas</div></div>
+            <div class="stat-card"><div class="num" style="color:#f87171" id="uiFail">-</div><div class="lbl">Problemas</div></div>
+        </div>
+
+        <div class="grid">
+            <!-- Scan Responsivo Completo -->
+            <div class="card" style="border:1px solid rgba(167,139,250,.3)">
+                <h3 style="color:#a78bfa">📱 Scan Responsivo Completo</h3>
+                <p class="desc">Testa todas as rotas em 3 viewports (Smartphone, Tablet, Desktop). Verifica meta viewport, tamanho de fonte, scroll horizontal e acessibilidade de botões.</p>
+                <button class="btn-primary" data-scan-btn style="background:#7c3aed" onclick="scanResponsivoCompleto()">🔍 Iniciar Scan Completo (3 Viewports)</button>
+            </div>
+
+            <!-- Scan Individual por Viewport -->
+            <div class="card">
+                <h3>🖥️ Scan Individual por Viewport</h3>
+                <p class="desc">Teste em uma resolução específica.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn-primary" style="background:#6366f1;flex:1;min-width:140px" onclick="scanResponsivoViewport(360, '📱 Smartphone')">📱 Smartphone (360px)</button>
+                    <button class="btn-primary" style="background:#8b5cf6;flex:1;min-width:140px" onclick="scanResponsivoViewport(768, '📱 Tablet')">📱 Tablet (768px)</button>
+                    <button class="btn-primary" style="background:#a78bfa;flex:1;min-width:140px" onclick="scanResponsivoViewport(1024, '💻 Desktop')">💻 Desktop (1024px)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Resultados -->
+        <div class="card" style="margin-top:1.2rem">
+            <h3>📊 Resultados por Rota × Viewport</h3>
+            <div style="overflow-x:auto">
+                <table class="ut-table" id="uiuxTable">
+                    <thead>
+                        <tr>
+                            <th>Página</th>
+                            <th>Rota</th>
+                            <th>📱 360px</th>
+                            <th>📱 768px</th>
+                            <th>💻 1024px</th>
+                            <th>Problemas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uiuxBody">
+                        <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:2rem">Clique em "Iniciar Scan Completo" para testar a responsividade.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB: EDITOR DE TEMPLATES (NOVO) ═══════ -->
+<div class="tab-content" id="tab-editor">
+    <div class="container" style="max-width:1200px">
+        <div style="display:grid; grid-template-columns: 1fr 320px; gap: 1.5rem">
+            <!-- Coluna Principal: Lista e Edição -->
+            <div>
+                <div class="card" style="border: 1px solid rgba(59,130,246,0.3); margin-bottom: 1.2rem">
+                    <h3 style="color:#60a5fa">🛠️ Gestão de Templates de Teste</h3>
+                    <p class="desc">Gerencie as páginas e rotas que o sistema monitora. Estas definições alimentam o <strong>Spider E2E</strong>, o <strong>Chaos Engine</strong> e a <strong>Varredura Nuclear</strong>.</p>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:1rem">
+                        <button class="btn-primary" style="width:auto; padding:.6rem 1.2rem" onclick="novoTemplate()">➕ Novo Template</button>
+                        <button class="btn-success" style="width:auto; padding:.6rem 1.2rem" onclick="carregarTemplatesEditor()">🔄 Sincronizar com Servidor</button>
+                    </div>
+
+                    <div style="overflow-x:auto">
+                        <table class="ut-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Rota</th>
+                                    <th>Módulo</th>
+                                    <th>Permissões</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editorTableBody">
+                                <tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--muted)">Carregando templates...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulário de Edição (Oculto por padrão) -->
+                <div id="editorFormContainer" style="display:none" class="card">
+                    <h3 id="editorFormTitle">Editar Template</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem">
+                        <div>
+                            <label class="lbl" style="color:var(--muted); font-size:0.8rem">ID Único:</label>
+                            <input type="text" id="edId" placeholder="ex: lista_usuarios" style="width:100%; background:#0f172a; border:1px solid var(--glass-border); padding:8px; color:white; border-radius:6px; margin-top:4px">
+                        </div>
+                        <div>
+                            <label class="lbl" style="color:var(--muted); font-size:0.8rem">Nome Amigável:</label>
+                            <input type="text" id="edNome" placeholder="Ex: Gestão de Usuários" style="width:100%; background:#0f172a; border:1px solid var(--glass-border); padding:8px; color:white; border-radius:6px; margin-top:4px">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:1rem; margin-bottom:1rem">
+                        <div>
+                            <label class="lbl" style="color:var(--muted); font-size:0.8rem">Rota (Flask Pattern):</label>
+                            <input type="text" id="edRota" placeholder="/admin/usuarios/<id>" style="width:100%; background:#0f172a; border:1px solid var(--glass-border); padding:8px; color:white; border-radius:6px; margin-top:4px">
+                        </div>
+                        <div>
+                            <label class="lbl" style="color:var(--muted); font-size:0.8rem">Módulo:</label>
+                            <input type="text" id="edModulo" placeholder="auth, admin, etc" style="width:100%; background:#0f172a; border:1px solid var(--glass-border); padding:8px; color:white; border-radius:6px; margin-top:4px">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:1rem">
+                        <label class="lbl" style="color:var(--muted); font-size:0.8rem">Roles Esperadas (Separadas por vírgula):</label>
+                        <input type="text" id="edRoles" placeholder="admin, master, tecnico" style="width:100%; background:#0f172a; border:1px solid var(--glass-border); padding:8px; color:white; border-radius:6px; margin-top:4px">
+                    </div>
+                    <div style="display:flex; gap:10px">
+                        <button class="btn-success" style="width:auto; padding:.7rem 2rem" onclick="salvarTemplateEditor()">💾 Salvar Alterações</button>
+                        <button class="btn-danger" style="width:auto; padding:.7rem 2rem" onclick="document.getElementById('editorFormContainer').style.display='none'">❌ Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Lateral: Guia de Pilares -->
+            <div>
+                <div class="card" style="border: 1px solid rgba(167,139,250,0.3); position:sticky; top:20px">
+                    <h3 style="color:#a78bfa">📚 Guia de Pilares</h3>
+                    <div style="font-size:0.85rem; line-height:1.5">
+                        <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--glass-border)">
+                            <strong style="color:#34d399">Pilar 0: Anti-Regressão</strong>
+                            <p style="color:var(--muted); font-size:0.75rem">Nunca quebre o que já funciona. Testes automáticos garantem a saúde do legado.</p>
+                        </div>
+                        <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--glass-border)">
+                            <strong style="color:#60a5fa">Pilar 3: RBAC & SSO</strong>
+                            <p style="color:var(--muted); font-size:0.75rem">Toda rota deve validar permissões. Se não está no Keycloak, não entra.</p>
+                        </div>
+                        <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--glass-border)">
+                            <strong style="color:#fbbf24">Pilar 5: Motor DFD</strong>
+                            <p style="color:var(--muted); font-size:0.75rem">Mapeie campos e formulários dinâmicos para garantir que a IA processe tudo corretamente.</p>
+                        </div>
+                        <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--glass-border)">
+                            <strong style="color:#f87171">Pilar 13: Sanitização</strong>
+                            <p style="color:var(--muted); font-size:0.75rem">Nenhum input é confiável. O Editor permite simular payloads maliciosos.</p>
+                        </div>
+                        <a href="https://github.com/Licitapro-Tecnologia/trproc/blob/main/docs/ARCHITECTURE.md" target="_blank" style="color:#a78bfa; text-decoration:none; font-weight:700; font-size:0.75rem">📖 Ver Todos os 15 Pilares →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 6: PERFORMANCE & LATÊNCIA ═══════ -->
+<div class="tab-content" id="tab-perf">
+    <div class="container">
+        <div class="stats" id="perfStats">
+            <div class="stat-card"><div class="num" id="perfTotal">-</div><div class="lbl">Rotas</div></div>
+            <div class="stat-card"><div class="num" style="color:#34d399" id="perfRapidos">-</div><div class="lbl">Rápidas</div></div>
+            <div class="stat-card"><div class="num" style="color:#f59e0b" id="perfMedios">-</div><div class="lbl">Médias</div></div>
+            <div class="stat-card"><div class="num" style="color:#f87171" id="perfLentos">-</div><div class="lbl">Lentas</div></div>
+            <div class="stat-card"><div class="num" style="color:#60a5fa" id="perfMedia">-</div><div class="lbl">Média (ms)</div></div>
+        </div>
+        <div class="card" style="border:1px solid rgba(245,158,11,.3)">
+            <h3 style="color:#f59e0b">⚡ Ranking de Latência por Rota</h3>
+            <p class="desc">Mede o tempo de resposta HTTP de cada rota mapeada. <span style="color:#34d399">✅ &lt;300ms</span> | <span style="color:#f59e0b">⚠️ 300-1000ms</span> | <span style="color:#f87171">❌ &gt;1000ms</span></p>
+            <button class="btn-warn" data-scan-btn onclick="scanPerformance()">⚡ Iniciar Scan de Performance</button>
+            <table class="ut-table" id="perfTable"><thead><tr>
+                <th>Rota</th><th>Módulo</th><th>Tempo (ms)</th><th>HTTP</th><th>Status</th>
+            </tr></thead><tbody id="perfBody"></tbody></table>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 7: HEADERS & SEGURANÇA DE REDE ═══════ -->
+<div class="tab-content" id="tab-headers">
+    <div class="container">
+        <div class="stats" id="headersStats">
+            <div class="stat-card"><div class="num" id="hdrTotal">-</div><div class="lbl">Rotas</div></div>
+            <div class="stat-card"><div class="num" style="color:#a78bfa" id="hdrScore">-</div><div class="lbl">Score Médio %</div></div>
+            <div class="stat-card"><div class="num" style="color:#f87171" id="hdrRedirects">0</div><div class="lbl">Open Redirects</div></div>
+            <div class="stat-card"><div class="num" style="color:#f87171" id="hdrCRLF">0</div><div class="lbl">CRLF Vulns</div></div>
+        </div>
+        <div class="card" style="border:1px solid rgba(167,139,250,.3)">
+            <h3 style="color:#a78bfa">🔒 Auditoria de Headers HTTP & Cookies</h3>
+            <p class="desc">Verifica presença de headers de segurança (CSP, HSTS, X-Frame-Options), flags de cookies (HttpOnly, Secure, SameSite), CORS, Open Redirect e CRLF Injection.</p>
+            <button class="btn-primary" data-scan-btn style="background:#7c3aed" onclick="scanHeaders()">🔒 Iniciar Scan de Headers</button>
+            <table class="ut-table" id="hdrTable"><thead><tr>
+                <th>Rota</th><th>Score</th><th>Headers Ausentes</th><th>Cookies</th><th>CORS</th>
+            </tr></thead><tbody id="hdrBody"></tbody></table>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ TAB 8: INTEGRIDADE DE DADOS ═══════ -->
+<div class="tab-content" id="tab-integrity">
+    <div class="container">
+        <div class="stats" id="integrityStats">
+            <div class="stat-card"><div class="num" id="intChecks">-</div><div class="lbl">Verificações</div></div>
+            <div class="stat-card"><div class="num" style="color:#f87171" id="intProblemas">-</div><div class="lbl">Problemas</div></div>
+            <div class="stat-card"><div class="num" style="color:#ef4444" id="intCriticos">-</div><div class="lbl">Críticos</div></div>
+        </div>
+        <div class="card" style="border:1px solid rgba(52,211,153,.3)">
+            <h3 style="color:#34d399">🗄️ Integridade do Banco de Dados</h3>
+            <p class="desc">Verifica FKs quebradas, registros órfãos, duplicatas e inconsistências no MySQL local. Análise puramente SQL — sem requests HTTP.</p>
+            <button class="btn-success" data-scan-btn onclick="scanIntegrity()">🗄️ Verificar Integridade</button>
+            <table class="ut-table" id="intTable"><thead><tr>
+                <th>Verificação</th><th>Categoria</th><th>Severidade</th><th>Encontrados</th><th>Status</th>
+            </tr></thead><tbody id="intBody"></tbody></table>
+        </div>
+    </div>
+</div>
+
+
+<div class="test-modal-overlay" id="testModal">
+    <div class="test-modal">
+        <div class="tm-header">
+            <div class="tm-spinner" id="tmSpinner"></div>
+            <h2 id="tmTitle">Executando Bateria de Testes</h2>
+            <p id="tmSubtitle">Aguarde enquanto todos os níveis são validados...</p>
+        </div>
+        <div style="text-align:center">
+            <div class="tm-level-badge" id="tmLevelBadge" style="background:#7c3aed;color:white">
+                👑 Testando: Admin
+            </div>
+        </div>
+        <div class="tm-progress-wrap">
+            <div class="tm-progress-bar" id="tmProgressBar" style="width:0%"></div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:.8rem" id="tmProgressLabel">
+            Nível 0 de 5 — 0% concluído
+        </div>
+        <div class="tm-stats-row">
+            <div class="tm-stat"><div class="n" id="tmStatTotal" style="color:#e2e8f0">0</div><div class="l">Testes</div></div>
+            <div class="tm-stat"><div class="n" id="tmStatPass" style="color:#34d399">0</div><div class="l">Passou</div></div>
+            <div class="tm-stat"><div class="n" id="tmStatFail" style="color:#f87171">0</div><div class="l">Falhou</div></div>
+            <div class="tm-stat"><div class="n" id="tmStatPages" style="color:#60a5fa">0</div><div class="l">Páginas</div></div>
+        </div>
+        <div class="tm-results-list" id="tmResultsList"></div>
+        <div style="text-align:center;margin-top:1rem;display:none" id="tmCloseWrap">
+            <button class="btn-primary" onclick="fecharModal()" style="width:auto;padding:.7rem 2rem;border-radius:10px">✅ Fechar e Ver Resultados</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const out = document.getElementById('consoleOutput');
+const utOut = document.getElementById('utConsole');
+let currentRole = 'admin';
+const roleDesc = {
+    admin:'Admin (acesso total)', master:'Master (multi-município)',
+    tecnico:'Técnico (suporte)', secretario:'Secretário (município isolado)',
+    cliente:'Cliente (seus processos)', todos:'Todos os Níveis (Análise Global)'
+};
+
+/* ═══════════════════════════════════════
+   TASK LOCK — Mutex Global Anti-Colisão
+   Impede que múltiplos scans/testes rodem
+   ao mesmo tempo, evitando sobrecarga.
+   ═══════════════════════════════════════ */
+const _taskLock = { running: false, name: null };
+let _debugDirty = false;
+let _currentTab = 'sandbox';
+
+function acquireLock(taskName) {
+    if (_taskLock.running) {
+        alert('⚠️ Aguarde! "' + _taskLock.name + '" ainda está em execução.\nAguarde a conclusão antes de iniciar outro teste.');
+        return false;
+    }
+    _taskLock.running = true;
+    _taskLock.name = taskName;
+    _updateLockUI(true, taskName);
+    return true;
+}
+
+function releaseLock() {
+    _taskLock.running = false;
+    _taskLock.name = null;
+    _updateLockUI(false, null);
+}
+
+function _updateLockUI(locked, taskName) {
+    document.querySelectorAll('[data-scan-btn]').forEach(function(btn) {
+        btn.disabled = locked;
+        btn.style.opacity = locked ? '.4' : '1';
+        btn.style.pointerEvents = locked ? 'none' : 'auto';
+        if (locked) {
+            btn.title = '⏳ Aguardando: ' + (taskName || '');
+        } else {
+            btn.title = '';
+        }
+    });
+}
+
+/* ── Tabs ── */
+function switchTab(id) {
+    _currentTab = id;
+    document.querySelectorAll('.tabs > .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    const tabMap = {sandbox:0, unit:1, unitario:2, debug:3, isolation:4, chaos:5, uiux:6, perf:7, headers:8, integrity:9};
+    const idx = tabMap[id];
+    if(idx !== undefined) document.querySelectorAll('.tabs > .tab')[idx].classList.add('active');
+    
+    const el = document.getElementById('tab-'+id);
+    if(el) el.classList.add('active');
+    
+    // Carregar dados específicos ao entrar na aba
+    if(id==='unit') carregarPaginas();
+    if(id==='unitario') renderListaTestesUnitarios();
+    if(id==='editor') carregarTemplatesEditor();
+    if(id==='debug') {
+        carregarDebug();
+        if (_debugDirty) { renderDebugTab(); _debugDirty = false; }
+        if (document.getElementById('debugAutoRefresh') && document.getElementById('debugAutoRefresh').checked && !debugAutoInterval) {
+            debugAutoInterval = setInterval(carregarDebug, 5000);
+        }
+    } else {
+        if (typeof debugAutoInterval !== 'undefined' && debugAutoInterval) {
+            clearInterval(debugAutoInterval);
+            debugAutoInterval = null;
+        }
+    }
+    if(id==='isolamento' || id==='isolation') carregarAcervoIsolamento();
+}
+
+/* ── Performance Scan (Tab 6) - Com Modal de Progresso ── */
+async function scanPerformance(){
+    if (!acquireLock('Scan de Performance')) return;
+    var paginas = [];
+    try{
+        var r = await fetch('/dev/tester/api/unit/paginas');
+        var d = await r.json();
+        paginas = d.paginas || [];
+    }catch(e){ releaseLock(); alert('Erro ao buscar rotas: '+e.message); return; }
+    if(!paginas.length){ releaseLock(); alert('Nenhuma rota encontrada.'); return; }
+
+    abrirScanModal('⚡ Scan de Performance', 'Medindo latência de cada rota...', '#f59e0b', paginas.length);
+
+    var rapidos=0, medios=0, lentos=0, tempos=[], tableHtml='';
+
+    for(var i=0; i<paginas.length; i++){
+        var p = paginas[i];
+        atualizarScanModal(i, paginas.length, '⚡ '+p.nome, 'Testando '+p.rota+'...');
+        try{
+            var res = await fetch('/dev/tester/api/performance/scan-route',{
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({rota:p.rota, nome:p.nome, modulo:p.modulo||'—'})
+            });
+            var rd = await res.json();
+            tempos.push(rd.tempo_ms>0?rd.tempo_ms:0);
+            var cor = rd.status==='rapido'?'#34d399':rd.status==='medio'?'#f59e0b':'#f87171';
+            var statusLabel = rd.status==='rapido'?'OK':rd.status==='medio'?'Alerta':'Falha';
+            if(rd.status==='rapido') rapidos++;
+            else if(rd.status==='medio') medios++;
+            else lentos++;
+
+            adicionarResultadoScan(rd.icone+' '+rd.pagina, rd.rota, rd.tempo_ms+'ms', statusLabel, cor);
+
+            tableHtml+='<tr><td>'+rd.rota+'</td><td style="color:var(--muted)">'+rd.modulo+'</td>'
+                +'<td style="color:'+cor+';font-weight:700">'+rd.tempo_ms+'ms</td>'
+                +'<td>'+rd.http_status+'</td><td>'+rd.icone+'</td></tr>';
+        }catch(e){
+            lentos++;
+            adicionarResultadoScan('❗ '+p.nome, p.rota, 'Erro', 'Falha', '#f87171');
+            tableHtml+='<tr><td>'+p.rota+'</td><td>—</td><td style="color:#f87171">Erro</td><td>0</td><td>❗</td></tr>';
+        }
+    }
+
+    var media = tempos.length? Math.round(tempos.reduce(function(a,b){return a+b},0)/tempos.length) : 0;
+    document.getElementById('perfTotal').textContent = paginas.length;
+    document.getElementById('perfRapidos').textContent = rapidos;
+    document.getElementById('perfMedios').textContent = medios;
+    document.getElementById('perfLentos').textContent = lentos;
+    document.getElementById('perfMedia').textContent = media+'ms';
+    document.getElementById('perfBody').innerHTML = tableHtml||'<tr><td colspan="5">Sem dados</td></tr>';
+
+    releaseLock();
+    concluirScanModal('⚡ Performance Concluída', rapidos+' rápidas, '+medios+' médias, '+lentos+' lentas. Média: '+media+'ms');
+}
+
+/* ── Headers Scan (Tab 7) - Com Modal de Progresso ── */
+async function scanHeaders(){
+    if (!acquireLock('Scan de Headers')) return;
+    abrirScanModal('🔒 Scan de Headers & Segurança', 'Preparando ambiente e buscando rotas...', '#a78bfa', 1);
+    
+    var paginas = [];
+    try{
+        var r = await fetch('/dev/tester/api/unit/paginas');
+        var d = await r.json();
+        paginas = d.paginas || [];
+    }catch(e){ 
+        releaseLock();
+        concluirScanModal('❌ Erro de Conexão', e.message);
+        alert('Erro ao buscar rotas: '+e.message); 
+        return; 
+    }
+    
+    if(!paginas.length){ 
+        releaseLock();
+        concluirScanModal('⚠️ Sem Rotas', 'Nenhuma rota foi encontrada para testar.');
+        alert('Nenhuma rota encontrada.'); 
+        return; 
+    }
+
+    // Atualiza o total do modal agora que sabemos a quantidade
+    document.getElementById('smProgressLabel').textContent = '0 de '+paginas.length+' — 0% concluído';
+
+    var scores=[], vulns=0, tableHtml='', ok=0, warn=0, fail=0;
+
+    for(var i=0; i<paginas.length; i++){
+        var p = paginas[i];
+        atualizarScanModal(i, paginas.length, '🔒 '+p.nome, 'Analisando headers HTTP de '+p.rota+'...');
+        try{
+            var res = await fetch('/dev/tester/api/security-headers/scan-route',{
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({rota:p.rota, nome:p.nome})
+            });
+            var rd = await res.json();
+            scores.push(rd.score);
+            var ausentes = (rd.headers_ausentes||[]).join(', ')||'Nenhum';
+            var cookies = (rd.cookies_inseguros||[]).map(function(c){return c.nome+': '+c.problemas.join(',')}).join('; ')||'OK';
+            var cor = rd.score>=80?'#34d399':rd.score>=50?'#f59e0b':'#f87171';
+            var statusLabel = rd.score>=80?'OK':rd.score>=50?'Alerta':'Falha';
+            if(rd.score>=80) ok++;
+            else if(rd.score>=50) warn++;
+            else fail++;
+            if(rd.headers_ausentes && rd.headers_ausentes.length) vulns += rd.headers_ausentes.length;
+
+            adicionarResultadoScan((rd.score>=80?'✅':'⚠️')+' '+rd.pagina, rd.rota, rd.score+'%', statusLabel, cor);
+
+            tableHtml+='<tr><td>'+rd.rota+'</td>'
+                +'<td style="color:'+cor+';font-weight:700">'+rd.score+'%</td>'
+                +'<td style="color:#f87171;font-size:.78rem">'+ausentes+'</td>'
+                +'<td style="font-size:.78rem">'+cookies+'</td>'
+                +'<td>'+(rd.cors_aberto?'<span style="color:#f87171">⚠️ Aberto</span>':'✅')+'</td></tr>';
+        }catch(e){
+            fail++;
+            adicionarResultadoScan('❗ '+p.nome, p.rota, '0%', 'Erro', '#f87171');
+            tableHtml+='<tr><td>'+p.rota+'</td><td style="color:#f87171">0%</td><td>Erro</td><td>—</td><td>❗</td></tr>';
+        }
+    }
+
+    var scoreMedio = scores.length? Math.round(scores.reduce(function(a,b){return a+b},0)/scores.length) : 0;
+    document.getElementById('hdrTotal').textContent = paginas.length;
+    document.getElementById('hdrScore').textContent = scoreMedio+'%';
+    document.getElementById('hdrBody').innerHTML = tableHtml||'<tr><td colspan="5">Sem dados</td></tr>';
+
+    releaseLock();
+    concluirScanModal('🔒 Headers Concluído', ok+' OK, '+warn+' alertas, '+fail+' falhas. Score médio: '+scoreMedio+'%');
+}
+
+/* ── Integrity Scan (Tab 8) - Com Modal de Progresso ── */
+async function scanIntegrity(){
+    if (!acquireLock('Scan de Integridade')) return;
+    abrirScanModal('🗄️ Verificação de Integridade', 'Iniciando varredura profunda no Banco de Dados...', '#34d399', 6);
+    
+    // Animação falsa de etapas para o usuário ver atividade detalhada enquanto o backend processa tudo
+    let fakeSteps = [
+        "Verificando FKs de Municípios em Registros...",
+        "Validando integridade de Usuários x Municípios...",
+        "Checando status orçamentários órfãos...",
+        "Buscando e-mails duplicados em usuários...",
+        "Verificando municípios sem registros vinculados...",
+        "Inspecionando Hub de Comunicações..."
+    ];
+    let fakeInterval = setInterval(() => {
+        let pct = Math.floor(Math.random() * 6);
+        atualizarScanModal(pct, 6, '🗄️ Varredura no BD', fakeSteps[pct]);
+    }, 800);
+
+    try{
+        var r = await fetch('/dev/tester/api/integrity/scan');
+        clearInterval(fakeInterval); // Backend respondeu!
+        var d = await r.json();
+        
+        document.getElementById('intChecks').textContent = d.total_checks;
+        document.getElementById('intProblemas').textContent = d.total_problemas;
+        document.getElementById('intCriticos').textContent = d.criticos;
+
+        var tableHtml='', ok=0, warn=0, fail=0;
+        var checks = d.checks||[];
+
+        for(var i=0; i<checks.length; i++){
+            var c = checks[i];
+            atualizarScanModal(i, checks.length, '🗄️ '+c.nome, 'Categoria: '+c.categoria+' | Severidade: '+c.severidade);
+
+            var sevCor = c.severidade==='CRÍTICA'?'#ef4444':c.severidade==='ALTA'?'#f59e0b':'#34d399';
+            var statusLabel = c.status==='pass'?'OK':'Falha';
+            if(c.status==='pass') ok++;
+            else if(c.severidade==='CRÍTICA') fail++;
+            else warn++;
+
+            adicionarResultadoScan(c.icone+' '+c.nome, c.categoria, c.total_encontrados+' encontrados', statusLabel, c.status==='pass'?'#34d399':'#f87171');
+
+            tableHtml+='<tr><td>'+c.nome+'</td><td>'+c.categoria+'</td>'
+                +'<td style="color:'+sevCor+';font-weight:600">'+c.severidade+'</td>'
+                +'<td style="font-weight:700">'+c.total_encontrados+'</td>'
+                +'<td>'+c.icone+' <span class="badge '+(c.status==='pass'?'badge-pass':'badge-fail')+'">'+c.status.toUpperCase()+'</span></td></tr>';
+
+            // Pequeno delay para animar a renderização final dos resultados reais
+            await new Promise(function(ok){setTimeout(ok, 200)});
+        }
+
+        document.getElementById('intBody').innerHTML = tableHtml||'<tr><td colspan="5">Sem dados</td></tr>';
+        releaseLock();
+        concluirScanModal('🗄️ Integridade Concluída', ok+' OK, '+warn+' alertas, '+fail+' falhas críticas. Total: '+checks.length+' verificações.');
+    }catch(e){
+        clearInterval(fakeInterval);
+        releaseLock();
+        concluirScanModal('❌ Erro na Integridade', e.message);
+        document.getElementById('intBody').innerHTML='<tr><td colspan="5" style="color:#f87171">Erro: '+e.message+'</td></tr>';
+    }
+}
+
+/* ── NUCLEAR SCAN (Polling com Progresso em Tempo Real) ── */
+let _nuclearPollInterval = null;
+let _nuclearLastLogCount = 0;
+
+async function dispararNuclear(){
+    if (!acquireLock('Varredura Nuclear')) return;
+    if(!confirm('☢️ VARREDURA NUCLEAR\n\nIsso irá executar TODOS os testes em background:\n• Unitários (todas as roles)\n• Performance\n• Headers de Segurança\n• Integridade de Dados\n• UI/UX & Responsividade\n\nO progresso será exibido ao vivo no Módulo de Debug.\n\nDeseja continuar?')) { releaseLock(); return; }
+
+    // Redireciona para aba Debug
+    switchTab('debug');
+
+    // Mostra painel nuclear
+    const panel = document.getElementById('nuclearPanel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior:'smooth'});
+
+    // Reset visual
+    document.getElementById('nuclearProgressBar').style.width = '0%';
+    document.getElementById('nuclearPct').textContent = '0%';
+    document.getElementById('nuclearTimer').textContent = '0s';
+    document.getElementById('nuclearStep').innerHTML = '⏳ Disparando scan nuclear...';
+    document.getElementById('nuclearTitle').textContent = '☢️ Varredura Nuclear em Andamento';
+    document.getElementById('nuclearTitle').style.color = '#f87171';
+    document.getElementById('nuclearSpinner').style.display = 'block';
+    document.getElementById('nuclearSubtitle').textContent = 'Inicializando...';
+    ['nucUnit','nucPerf','nucHdr','nucInt','nucUiux'].forEach(id => document.getElementById(id).textContent = '—');
+    ['nucUnitDetail','nucPerfDetail','nucHdrDetail','nucIntDetail','nucUiuxDetail'].forEach(id => document.getElementById(id).textContent = 'Aguardando');
+    ['nucCard1','nucCard2','nucCard3','nucCard4','nucCard5'].forEach(id => { document.getElementById(id).style.opacity = '.4'; document.getElementById(id).style.borderColor = 'rgba(255,255,255,.06)'; });
+    document.getElementById('nuclearLogWrap').style.display = 'block';
+    document.getElementById('nuclearLogList').innerHTML = '<div style="color:#f59e0b">⏳ Aguardando resultados...</div>';
+    _nuclearLastLogCount = 0;
+
+    try{
+        const r = await fetch('/dev/tester/api/nuclear/scan',{method:'POST'});
+        const d = await r.json();
+        if(d.status === 'running'){
+            document.getElementById('nuclearStep').textContent = '\u26a0\ufe0f Uma varredura j\u00e1 est\u00e1 em execu\u00e7\u00e3o. Acompanhando...';
+        }
+    }catch(e){
+        releaseLock();
+        document.getElementById('nuclearStep').textContent = '\u274c Erro ao disparar: '+e.message;
+        return;
+    }
+
+    // Inicia polling a cada 800ms
+    if(_nuclearPollInterval) clearInterval(_nuclearPollInterval);
+    _nuclearPollInterval = setInterval(pollNuclearStatus, 800);
+}
+
+async function pollNuclearStatus(){
+    try{
+        const r = await fetch('/dev/tester/api/nuclear/status');
+        const s = await r.json();
+
+        document.getElementById('nuclearProgressBar').style.width = s.progresso_pct + '%';
+        document.getElementById('nuclearPct').textContent = s.progresso_pct + '%';
+        document.getElementById('nuclearTimer').textContent = s.elapsed_sec + 's';
+
+        document.getElementById('nuclearSubtitle').textContent = 'Fase '+s.fase_atual+'/'+s.total_fases+': '+s.fase_nome;
+        document.getElementById('nuclearStep').textContent = '\u23f3 '+s.sub_step;
+
+        // Renderiza logs detalhados
+        if(s.log_history && s.log_history.length > 0) {
+            var logEl = document.getElementById('nuclearLogList');
+            if(s.log_history.length !== _nuclearLastLogCount) {
+                var html = '';
+                s.log_history.forEach(function(lg){
+                    var cor = lg.tipo==='header'?'#60a5fa':lg.tipo==='pass'?'#34d399':lg.tipo==='fail'?'#f87171':lg.tipo==='warn'?'#fbbf24':'#94a3b8';
+                    var weight = lg.tipo==='header'?'700':'400';
+                    var bg = lg.tipo==='header'?'rgba(96,165,250,.08)':'transparent';
+                    html += '<div style="color:'+cor+';font-weight:'+weight+';padding:2px 4px;border-radius:4px;background:'+bg+'">';
+                    html += '<span style="color:#475569;margin-right:6px">['+lg.ts+'s]</span>' + lg.msg + '</div>';
+                });
+                logEl.innerHTML = html;
+                _nuclearLastLogCount = s.log_history.length;
+                var wrap = document.getElementById('nuclearLogWrap');
+                wrap.scrollTop = wrap.scrollHeight;
+            }
+        }
+
+        var faseCards = {1:'nucCard1', 2:'nucCard2', 3:'nucCard3', 4:'nucCard4', 5:'nucCard5'};
+        for(var f in faseCards){
+            var card = document.getElementById(faseCards[f]);
+            if(parseInt(f) === s.fase_atual){ card.style.opacity='1'; card.style.borderColor='#f59e0b'; }
+            else if(parseInt(f) < s.fase_atual){ card.style.opacity='1'; card.style.borderColor='rgba(52,211,153,.4)'; }
+        }
+
+        var u = s.resultados_parciais.unitarios;
+        if(u.done){
+            document.getElementById('nucUnit').innerHTML = '<span style="color:#34d399">'+u.passou+'\u2705</span> <span style="color:#f87171">'+u.falhou+'\u274c</span>';
+            document.getElementById('nucUnitDetail').textContent = u.total+' testes';
+            document.getElementById('nucCard1').style.borderColor = u.falhou>0 ? 'rgba(239,68,68,.4)' : 'rgba(52,211,153,.4)';
+        }
+
+        var p = s.resultados_parciais.performance;
+        if(p.done){
+            document.getElementById('nucPerf').innerHTML = '<span style="color:#60a5fa">'+p.media_ms+'ms</span>';
+            document.getElementById('nucPerfDetail').textContent = p.rapidos+' rapidas, '+p.lentos+' lentas';
+            document.getElementById('nucCard2').style.borderColor = p.lentos>0 ? 'rgba(245,158,11,.4)' : 'rgba(52,211,153,.4)';
+        }
+
+        var h = s.resultados_parciais.headers;
+        if(h.done){
+            var hColor = h.score>=80 ? '#34d399' : h.score>=50 ? '#f59e0b' : '#f87171';
+            document.getElementById('nucHdr').innerHTML = '<span style=\"color:'+hColor+'\">'+h.score+'%</span>';
+            document.getElementById('nucHdrDetail').textContent = h.vulns+' vulnerabilidades';
+            document.getElementById('nucCard3').style.borderColor = h.vulns>0 ? 'rgba(239,68,68,.4)' : 'rgba(52,211,153,.4)';
+        }
+
+        var ig = s.resultados_parciais.integridade;
+        if(ig.done){
+            document.getElementById('nucInt').innerHTML = '<span style=\"color:'+(ig.criticos>0?'#ef4444':'#34d399')+'\">'+ig.problemas+' problemas</span>';
+            document.getElementById('nucIntDetail').textContent = ig.criticos+' criticos';
+            document.getElementById('nucCard4').style.borderColor = ig.criticos>0 ? 'rgba(239,68,68,.4)' : 'rgba(52,211,153,.4)';
+        }
+
+        var ux = s.resultados_parciais.uiux;
+        if(ux && ux.done){
+            var uxColor = ux.score_medio>=80 ? '#34d399' : ux.score_medio>=50 ? '#f59e0b' : '#f87171';
+            document.getElementById('nucUiux').innerHTML = '<span style=\"color:'+uxColor+'\">'+ux.score_medio+'%</span>';
+            document.getElementById('nucUiuxDetail').textContent = ux.total+' testes, '+ux.problemas+' problemas';
+            document.getElementById('nucCard5').style.borderColor = ux.problemas>0 ? 'rgba(245,158,11,.4)' : 'rgba(52,211,153,.4)';
+        }
+
+        if(s.concluido){
+            clearInterval(_nuclearPollInterval);
+            _nuclearPollInterval = null;
+            releaseLock();
+            document.getElementById('nuclearSpinner').style.display = 'none';
+            if(s.erro){
+                document.getElementById('nuclearTitle').textContent = '\u274c Erro na Varredura Nuclear';
+                document.getElementById('nuclearTitle').style.color = '#ef4444';
+                document.getElementById('nuclearStep').textContent = '\u274c '+s.erro;
+            } else {
+                document.getElementById('nuclearTitle').textContent = '\u2705 Varredura Nuclear Conclu\u00edda!';
+                document.getElementById('nuclearTitle').style.color = '#34d399';
+                document.getElementById('nuclearStep').textContent = '\u2705 Todas as '+s.total_fases+' fases conclu\u00eddas em '+s.elapsed_sec+'s. Resultados no Debug Engine.';
+                document.getElementById('nuclearPanel').style.borderColor = 'rgba(52,211,153,.4)';
+            }
+            carregarDebug();
+        }
+    }catch(e){/* ignora erros de polling */}
+}
+
+
+
+/* ── Modal Universal de Scan (Helpers) ── */
+function abrirScanModal(titulo, subtitulo, cor, totalItems){
+    var modal = document.getElementById('scanModal');
+    modal.style.display = 'flex';
+    document.getElementById('smTitle').textContent = titulo;
+    document.getElementById('smSubtitle').textContent = subtitulo;
+    document.getElementById('smBadge').style.background = cor;
+    document.getElementById('smBadge').textContent = '⏳ Inicializando...';
+    document.getElementById('smProgressBar').style.width = '0%';
+    document.getElementById('smProgressBar').style.background = cor;
+    document.getElementById('smProgressLabel').textContent = '0 de '+totalItems+' — 0% concluído';
+    document.getElementById('smStatTotal').textContent = '0';
+    document.getElementById('smStatPass').textContent = '0';
+    document.getElementById('smStatWarn').textContent = '0';
+    document.getElementById('smStatFail').textContent = '0';
+    document.getElementById('smResultsList').innerHTML = '';
+    document.getElementById('smCloseWrap').style.display = 'none';
+    document.getElementById('smSpinner').style.display = 'block';
+}
+
+function atualizarScanModal(current, total, badgeText, stepText){
+    var pct = Math.round(((current+1)/total)*100);
+    document.getElementById('smProgressBar').style.width = pct+'%';
+    document.getElementById('smProgressLabel').textContent = (current+1)+' de '+total+' — '+pct+'% concluído';
+    document.getElementById('smBadge').textContent = badgeText;
+    document.getElementById('smSubtitle').textContent = stepText;
+    document.getElementById('smStatTotal').textContent = (current+1);
+}
+
+function adicionarResultadoScan(titulo, detalhe, valor, statusLabel, cor){
+    var list = document.getElementById('smResultsList');
+    var item = document.createElement('div');
+    item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:.55rem .8rem;margin:.25rem 0;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid '+cor+';font-size:.82rem;animation:fadeIn .3s ease';
+    item.innerHTML = '<div style="flex:1"><strong style="color:#e2e8f0">'+titulo+'</strong><div style="color:var(--muted);font-size:.75rem;margin-top:.15rem">'+detalhe+'</div></div>'
+        +'<div style="text-align:right;min-width:80px"><div style="color:'+cor+';font-weight:700;font-size:.9rem">'+valor+'</div><div style="font-size:.7rem;color:var(--muted)">'+statusLabel+'</div></div>';
+    list.prepend(item);
+    list.scrollTop = 0;
+
+    // Atualiza contadores
+    if(statusLabel==='OK'){
+        var p = document.getElementById('smStatPass');
+        p.textContent = parseInt(p.textContent)+1;
+    } else if(statusLabel==='Alerta'){
+        var w = document.getElementById('smStatWarn');
+        w.textContent = parseInt(w.textContent)+1;
+    } else {
+        var f = document.getElementById('smStatFail');
+        f.textContent = parseInt(f.textContent)+1;
+    }
+}
+
+function concluirScanModal(titulo, resumo){
+    document.getElementById('smSpinner').style.display = 'none';
+    document.getElementById('smTitle').textContent = titulo;
+    document.getElementById('smSubtitle').textContent = resumo;
+    document.getElementById('smCloseWrap').style.display = 'block';
+    document.getElementById('smProgressBar').style.width = '100%';
+}
+
+function fecharScanModal(){
+    document.getElementById('scanModal').style.display = 'none';
+}
+
+/* ── Logs ── */
+function log(msg,type='info',target=out){
+    const t=new Date().toLocaleTimeString();
+    const d=document.createElement('div');
+    d.className=`log-entry log-${type}`;
+    d.innerHTML=`<span style="color:#475569">[${t}]</span> ${msg}`;
+    target.appendChild(d);target.scrollTop=target.scrollHeight;
+}
+function clearConsole(){out.innerHTML='';log('Console limpo.','system');}
+function clearUTConsole(){utOut.innerHTML='';log('Console limpo.','system',utOut);}
+
+/* ── RBAC ── */
+function switchRole(role,el){
+    currentRole=role;
+    document.querySelectorAll('.rbac-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('rbacStatus').textContent=`Ativo: ${roleDesc[role]}`;
+    log(`Trocando nível → ${roleDesc[role]}`,'system');
+    fetch('/dev/tester/api/simulate-rbac',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({role,municipio_id:1})})
+    .then(r=>r.json()).then(d=>log(d.message||'OK','success')).catch(e=>log(`Erro: ${e.message}`,'error'));
+}
+
+/* ── Spider E2E ── */
+async function iniciarSpider() {
+    if (!acquireLock('Spider E2E')) return;
+    log('🕷️ Inicializando Spider E2E Crawler...', 'system');
+    let paginas = [];
+    try {
+        const r = await fetch('/dev/tester/api/unit/paginas');
+        const d = await r.json();
+        paginas = d.paginas || [];
+    } catch(e) {
+        releaseLock();
+        log(`Erro ao buscar rotas: ${e.message}`, 'error');
+        return;
+    }
+    if (!paginas.length) { releaseLock(); log('Nenhuma página encontrada.', 'error'); return; }
+
+    abrirScanModal('🕷️ Spider E2E Crawler', 'Varrendo todas as rotas do sistema...', '#3b82f6', paginas.length);
+
+    let falhas = 0, ok = 0, warns = 0;
+    for (let i = 0; i < paginas.length; i++) {
+        var p = paginas[i];
+        atualizarScanModal(i, paginas.length, '🕷️ ' + p.nome, 'GET ' + p.rota + '...');
+        try {
+            const url = p.rota.replace(/<[^>]+>/g, '1');
+            // redirect:'manual' previne CORS ao seguir redirects externos (Keycloak)
+            const res = await fetch(url, { method: 'GET', headers:{'Accept':'text/html'}, redirect:'manual' });
+            
+            if (res.status === 200) {
+                const text = await res.text();
+                if (text.includes('TemplateNotFound') || text.includes('Traceback (most recent call last)')) {
+                    falhas++;
+                    adicionarResultadoScan('❌ '+p.nome, url+' → TemplateNotFound (500 Falso)', res.status, 'Falha', '#f87171');
+                    log('❌ [500 Falso] '+p.nome+' ('+url+')', 'error');
+                } else {
+                    ok++;
+                    adicionarResultadoScan('✅ '+p.nome, url, 'HTTP '+res.status, 'OK', '#34d399');
+                }
+            } else if (res.status === 302 || res.status === 301 || res.type === 'opaqueredirect') {
+                // Redirect (ex: /login → Keycloak) — comportamento esperado
+                ok++;
+                adicionarResultadoScan('🔄 '+p.nome, url+' → Redirect (auth)', 'HTTP '+res.status, 'OK', '#60a5fa');
+            } else if (res.status === 0) {
+                // opaqueredirect retorna status 0
+                ok++;
+                adicionarResultadoScan('🔄 '+p.nome, url+' → Redirect externo', 'Redirect', 'OK', '#60a5fa');
+            } else if (res.status === 405) {
+                warns++;
+                adicionarResultadoScan('⚠️ '+p.nome, url+' → Method Not Allowed', 'HTTP 405', 'Alerta', '#f59e0b');
+            } else if (res.status === 403) {
+                ok++;
+                adicionarResultadoScan('🔒 '+p.nome, url+' → RBAC bloqueou', 'HTTP 403', 'OK', '#34d399');
+            } else if (res.status === 404) {
+                warns++;
+                adicionarResultadoScan('⚠️ '+p.nome, url+' → Rota não encontrada', 'HTTP 404', 'Alerta', '#f59e0b');
+                log('⚠️ [404] '+p.nome+' ('+url+')', 'warn');
+            } else {
+                falhas++;
+                adicionarResultadoScan('❌ '+p.nome, url+' → Erro HTTP', 'HTTP '+res.status, 'Falha', '#f87171');
+                log('❌ ['+res.status+'] '+p.nome, 'error');
+            }
+        } catch(e) {
+            // CORS ou erro de rede — não é falha grave, é proteção
+            if (e.message && e.message.includes('CORS')) {
+                ok++;
+                adicionarResultadoScan('🔒 '+p.nome, p.rota+' → CORS (redirect externo)', 'Protegido', 'OK', '#60a5fa');
+            } else {
+                warns++;
+                adicionarResultadoScan('⚠️ '+p.nome, p.rota+' → '+e.message, 'Erro Rede', 'Alerta', '#f59e0b');
+                log('⚠️ Erro rede: '+p.rota+': '+e.message, 'warn');
+            }
+        }
+    }
+    
+    releaseLock();
+    concluirScanModal(
+        falhas > 0 ? '🕷️ Spider — '+falhas+' Quebras Detectadas' : '🕷️ Spider — Todas as Rotas OK',
+        ok+' OK, '+warns+' alertas, '+falhas+' falhas em '+paginas.length+' rotas'
+    );
+    log(falhas>0 ? `🕷️ ${falhas} quebras detectadas.` : '🕷️ Nenhuma quebra!', falhas>0?'error':'success');
+}
+
+/* ── Sandbox Actions ── */
+async function runAction(ep,msg,extra={}, targetConsole=out){
+    log(msg,'system', targetConsole);
+    try {
+        const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(extra)});
+        const d=await r.json();
+        log(d.message||JSON.stringify(d), d.status==='success'?'success':'error', targetConsole);
+        if (d.logs && Array.isArray(d.logs)) {
+            d.logs.forEach(l => log('  ↳ ' + l, 'info', targetConsole));
+        }
+    }
+    catch(e){log('Erro: '+e.message,'error',targetConsole);}
+}
+
+/* ── Chaos Engine Actions ── */
+let chaosOut; // Definido logo após DOM carregar, mas para garantir:
+function getChaosOut() { if(!chaosOut) chaosOut = document.getElementById('chaosConsole'); return chaosOut; }
+
+function clearChaosConsole() { getChaosOut().innerHTML=''; log('Console Chaos limpo.','system', getChaosOut()); }
+
+function injetarMassaChaos() {
+    log('Iniciando injeção de Massa Chaos... Isso pode demorar.', 'system', getChaosOut());
+    fetch('/dev/tester/api/chaos/injetar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({num_muns: 10, procs_per_mun: 50})
+    }).then(r=>r.json()).then(d=>{
+        log(d.message, d.status==='success'?'success':'error', getChaosOut());
+    }).catch(e=>log('Erro: '+e.message, 'error', getChaosOut()));
+}
+
+async function iniciarChaosEngine() {
+    if (!acquireLock('Chaos Engine')) return;
+    const thr = parseInt(document.getElementById('chaosThreads').value) || 10;
+    const msgs = parseInt(document.getElementById('chaosMsgs').value) || 20;
+    
+    // Buscar páginas do sistema para fuzzing
+    let paginas = [];
+    try {
+        const r = await fetch('/dev/tester/api/unit/paginas');
+        const d = await r.json();
+        paginas = d.paginas || [];
+    } catch(e) { /* continua mesmo sem páginas */ }
+
+    const roles = ['admin','master','tecnico','secretario','cliente'];
+    const totalFuzz = paginas.length * roles.length;
+    const totalSteps = totalFuzz + 1; // +1 para o estresse de banco
+
+    abrirScanModal('🌪️ Chaos Engine — Fuzzing E2E', 
+        'Testando CRUD em cada página com cada nível de acesso...', '#ef4444', totalSteps);
+
+    let stepCount = 0;
+    let fuzzOk = 0, fuzzWarn = 0, fuzzFail = 0;
+
+    // FASE 1: Fuzzing CRUD por Página × Nível
+    for (let pi = 0; pi < paginas.length; pi++) {
+        var pag = paginas[pi];
+        for (let ri = 0; ri < roles.length; ri++) {
+            var role = roles[ri];
+            var roleIcon = {admin:'👑',master:'⚡',tecnico:'🔧',secretario:'🏛',cliente:'👤'}[role] || '👤';
+            
+            atualizarScanModal(stepCount, totalSteps, 
+                roleIcon+' ['+role.toUpperCase()+'] '+pag.nome,
+                'Fuzzing '+pag.rota+' como '+role+'...');
+
+            try {
+                var res = await fetch('/dev/tester/api/chaos/fuzz-page', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        pagina_id: pag.id,
+                        rota: pag.rota,
+                        nome: pag.nome,
+                        role: role,
+                        formularios: pag.formularios || [],
+                        botoes: pag.botoes || []
+                    })
+                });
+                var rd = await res.json();
+
+                if (rd.status === 'pass') {
+                    fuzzOk++;
+                    adicionarResultadoScan(
+                        '✅ '+roleIcon+' '+pag.nome,
+                        '['+role.toUpperCase()+'] '+pag.rota+' — '+rd.detalhe,
+                        rd.testes_ok+'/'+rd.testes_total, 'OK', '#34d399');
+                } else if (rd.status === 'warn') {
+                    fuzzWarn++;
+                    adicionarResultadoScan(
+                        '⚠️ '+roleIcon+' '+pag.nome,
+                        '['+role.toUpperCase()+'] '+pag.rota+' — '+rd.detalhe,
+                        rd.testes_ok+'/'+rd.testes_total, 'Alerta', '#f59e0b');
+                } else {
+                    fuzzFail++;
+                    adicionarResultadoScan(
+                        '❌ '+roleIcon+' '+pag.nome,
+                        '['+role.toUpperCase()+'] '+pag.rota+' — '+rd.detalhe,
+                        rd.testes_ok+'/'+rd.testes_total, 'Falha', '#f87171');
+                }
+            } catch(e) {
+                fuzzFail++;
+                adicionarResultadoScan(
+                    '💥 '+roleIcon+' '+pag.nome,
+                    '['+role.toUpperCase()+'] Erro: '+e.message,
+                    'ERRO', 'Falha', '#f87171');
+            }
+            stepCount++;
+        }
+    }
+
+    // FASE 2: Estresse de Banco (Chaos Original)
+    atualizarScanModal(stepCount, totalSteps, '🌪️ Estresse de Banco',
+        'Disparando '+thr+' threads × '+msgs+' mensagens no Hub...');
+
+    try {
+        var chaosRes = await fetch('/dev/tester/api/chaos/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({num_threads: thr, mensagens_por_thread: msgs})
+        });
+        var chaosData = await chaosRes.json();
+        
+        if (chaosData.status === 'success') {
+            adicionarResultadoScan(
+                '🌪️ Estresse de Banco',
+                thr+' threads × '+msgs+' msgs | Enviadas: '+chaosData.mensagens_enviadas,
+                chaosData.erros_corridos+' erros',
+                chaosData.erros_corridos > 0 ? 'Alerta' : 'OK',
+                chaosData.erros_corridos > 0 ? '#f59e0b' : '#34d399');
+            if (chaosData.erros_corridos > 0) fuzzWarn++;
+            else fuzzOk++;
+        } else {
+            fuzzFail++;
+            adicionarResultadoScan('❌ Estresse de Banco', chaosData.message || 'Erro', 'FALHA', 'Falha', '#f87171');
+        }
+    } catch(e) {
+        fuzzFail++;
+        adicionarResultadoScan('💥 Estresse de Banco', 'Erro fatal: '+e.message, 'ERRO', 'Falha', '#f87171');
+    }
+    stepCount++;
+
+    releaseLock();
+    concluirScanModal(
+        '🌪️ Chaos Engine Concluído',
+        fuzzOk+' OK, '+fuzzWarn+' alertas, '+fuzzFail+' falhas. ('+totalSteps+' operações testadas)'
+    );
+    log('🌪️ Chaos: '+fuzzOk+' OK, '+fuzzWarn+' alertas, '+fuzzFail+' falhas', fuzzFail>0?'error':'success', getChaosOut());
+}
+
+/* ═══════════════════════════════════════
+   SIMULADOR RESPONSIVO (UI/UX & Mobile)
+   ═══════════════════════════════════════ */
+let _uiuxResultados = {}; // { pagina_id: { 360: {...}, 768: {...}, 1024: {...} } }
+
+async function scanResponsivoCompleto() {
+    if (!acquireLock('Scan Responsivo')) return;
+    let paginas = [];
+    try {
+        const r = await fetch('/dev/tester/api/unit/paginas');
+        const d = await r.json();
+        paginas = d.paginas || [];
+    } catch(e) { releaseLock(); alert('Erro: '+e.message); return; }
+    if (!paginas.length) { releaseLock(); alert('Nenhuma rota encontrada.'); return; }
+
+    const viewports = [
+        {w:360, label:'📱 Smartphone (360px)'},
+        {w:768, label:'📱 Tablet (768px)'},
+        {w:1024, label:'💻 Desktop (1024px)'}
+    ];
+    const totalSteps = paginas.length * viewports.length;
+    _uiuxResultados = {};
+
+    abrirScanModal('📱 Scan Responsivo Completo', 'Testando '+paginas.length+' rotas × 3 viewports...', '#a78bfa', totalSteps);
+
+    let step = 0, ok = 0, warn = 0, fail = 0;
+
+    for (let pi = 0; pi < paginas.length; pi++) {
+        var pag = paginas[pi];
+        var pid = pag.id || ('pg_'+pi);  // Safe key fallback
+        if (!_uiuxResultados[pid]) _uiuxResultados[pid] = {nome: pag.nome, rota: pag.rota};
+
+        for (let vi = 0; vi < viewports.length; vi++) {
+            var vp = viewports[vi];
+            atualizarScanModal(step, totalSteps, vp.label+' '+pag.nome, 'Viewport '+vp.w+'px → '+pag.rota);
+
+            try {
+                var res = await fetch('/dev/tester/api/uiux/scan-responsive', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({rota: pag.rota, nome: pag.nome, viewport_width: vp.w, botoes: pag.botoes||[]})
+                });
+                var rd = await res.json();
+                _uiuxResultados[pid][vp.w] = rd;
+
+                if (rd.status === 'pass') {
+                    ok++;
+                    adicionarResultadoScan('✅ '+pag.nome, vp.label+' → '+rd.detalhe, rd.score+'%', 'OK', '#34d399');
+                } else if (rd.status === 'warn') {
+                    warn++;
+                    adicionarResultadoScan('⚠️ '+pag.nome, vp.label+' → '+rd.detalhe, rd.score+'%', 'Alerta', '#f59e0b');
+                } else {
+                    fail++;
+                    adicionarResultadoScan('❌ '+pag.nome, vp.label+' → '+(rd.detalhe||'Falha'), (rd.score||0)+'%', 'Falha', '#f87171');
+                }
+            } catch(e) {
+                fail++;
+                if (_uiuxResultados[pid]) {
+                    _uiuxResultados[pid][vp.w] = {status:'fail', score:0, detalhe:'Erro: '+e.message};
+                }
+                adicionarResultadoScan('💥 '+pag.nome, vp.label+' → Erro: '+e.message, '0%', 'Falha', '#f87171');
+            }
+            step++;
+        }
+    }
+
+    // Atualizar stats
+    document.getElementById('uiTotal').textContent = paginas.length;
+    document.getElementById('uiOk').textContent = ok;
+    document.getElementById('uiWarn').textContent = warn;
+    document.getElementById('uiFail').textContent = fail;
+
+    // Renderizar tabela de resultados
+    _renderUiuxTable();
+
+    releaseLock();
+    concluirScanModal('📱 Scan Responsivo Concluído',
+        ok+' OK, '+warn+' alertas, '+fail+' falhas em '+totalSteps+' testes');
+}
+
+async function scanResponsivoViewport(width, label) {
+    let paginas = [];
+    try {
+        const r = await fetch('/dev/tester/api/unit/paginas');
+        const d = await r.json();
+        paginas = d.paginas || [];
+    } catch(e) { alert('Erro: '+e.message); return; }
+    if (!paginas.length) { alert('Nenhuma rota.'); return; }
+
+    abrirScanModal(label+' Scan', 'Testando '+paginas.length+' rotas em '+width+'px...', '#a78bfa', paginas.length);
+
+    let ok = 0, warn = 0, fail = 0;
+    for (let i = 0; i < paginas.length; i++) {
+        var pag = paginas[i];
+        var pid = pag.id || ('pg_'+i);  // Safe key fallback
+        atualizarScanModal(i, paginas.length, label+' '+pag.nome, width+'px → '+pag.rota);
+        if (!_uiuxResultados[pid]) _uiuxResultados[pid] = {nome: pag.nome, rota: pag.rota};
+
+        try {
+            var res = await fetch('/dev/tester/api/uiux/scan-responsive', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({rota: pag.rota, nome: pag.nome, viewport_width: width, botoes: pag.botoes||[]})
+            });
+            var rd = await res.json();
+            _uiuxResultados[pid][width] = rd;
+
+            if (rd.status === 'pass') { ok++; adicionarResultadoScan('✅ '+pag.nome, pag.rota, rd.score+'%', 'OK', '#34d399'); }
+            else if (rd.status === 'warn') { warn++; adicionarResultadoScan('⚠️ '+pag.nome, pag.rota+' → '+rd.detalhe, rd.score+'%', 'Alerta', '#f59e0b'); }
+            else { fail++; adicionarResultadoScan('❌ '+pag.nome, pag.rota+' → '+(rd.detalhe||'Falha'), (rd.score||0)+'%', 'Falha', '#f87171'); }
+        } catch(e) {
+            fail++;
+            if (_uiuxResultados[pid]) {
+                _uiuxResultados[pid][width] = {status:'fail', score:0, detalhe:'Erro: '+e.message};
+            }
+            adicionarResultadoScan('💥 '+pag.nome, 'Erro: '+e.message, '0%', 'Falha', '#f87171');
+        }
+    }
+
+    _renderUiuxTable();
+    concluirScanModal(label+' Concluído', ok+' OK, '+warn+' alertas, '+fail+' falhas');
+}
+
+function _renderUiuxTable() {
+    var html = '';
+    for (var id in _uiuxResultados) {
+        var r = _uiuxResultados[id];
+        var problems = [];
+        function _badge(vp) {
+            var d = r[vp];
+            if (!d) return '<span style="color:var(--muted)">—</span>';
+            var cor = d.status==='pass'?'#34d399':d.status==='warn'?'#f59e0b':'#f87171';
+            if (d.status !== 'pass' && d.detalhe) problems.push(vp+'px: '+d.detalhe);
+            return '<span style="color:'+cor+';font-weight:700">'+d.score+'%</span>';
+        }
+        var b360 = _badge(360), b768 = _badge(768), b1024 = _badge(1024);
+        html += '<tr><td>'+r.nome+'</td><td style="color:var(--muted);font-size:.8rem">'+r.rota+'</td>'
+            +'<td>'+b360+'</td><td>'+b768+'</td><td>'+b1024+'</td>'
+            +'<td style="color:#f59e0b;font-size:.75rem">'+(problems.length?problems.join('<br>'):'✅')+'</td></tr>';
+    }
+    document.getElementById('uiuxBody').innerHTML = html || '<tr><td colspan="6" style="color:var(--muted);text-align:center">Sem dados</td></tr>';
+}
+
+/* ═══════════════════════════════════════
+   TESTES UNITÁRIOS
+   ═══════════════════════════════════════ */
+let paginasCache = [];
+let ultimaListaFalhas = [];
+
+async function renderDebugTab(){
+    const container = document.getElementById('debugListContainer');
+    if(!ultimaListaFalhas || ultimaListaFalhas.length === 0){
+        container.innerHTML = '<p style="color:var(--success);text-align:center;padding:2rem;font-weight:bold;font-size:1.1rem">✅ Nenhum erro listado. O sistema parece estar 100%.</p>';
+        return;
+    }
+    
+    // Envia as falhas para o analisador dinâmico (leitura do código, SEM modificar)
+    container.innerHTML = '<p style="color:#fbbf24;text-align:center;padding:2rem">⏳ Analisando falhas pelo código-fonte (somente leitura)...</p>';
+    
+    let analises = ultimaListaFalhas;
+    try {
+        const res = await fetch('/dev/tester/api/debug/analisar-falhas', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({falhas: ultimaListaFalhas})
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.analises) {
+            analises = data.analises;
+        }
+    } catch(e) { console.warn('Analisador dinâmico indisponível, mostrando dados brutos.'); }
+    
+    const sevColor = {'CRÍTICA':'#f87171','ALTA':'#fbbf24','MÉDIA':'#94a3b8'};
+    let html = `<b style="color:#f87171">📋 Análise Dinâmica das Falhas (${analises.length}):</b>`;
+    html += `<div style="margin-top:12px">`;
+    
+    analises.forEach((a, idx) => {
+        const ctx = a.contexto_compilado || {};
+        const sev = a.severidade || 'MÉDIA';
+        const caminho = a.caminho_codigo || [];
+        
+        html += `<div style="background:rgba(15,23,42,.8);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div>
+                    <b style="color:#e2e8f0">${a.pagina || '?'}</b>
+                    <span style="font-family:monospace;font-size:.75rem;color:var(--muted);margin-left:8px">${a.rota || '?'}</span>
+                </div>
+                <div style="display:flex;gap:6px">
+                    <span class="badge" style="background:rgba(239,68,68,.15);color:${sevColor[sev]||'#94a3b8'}">${sev}</span>
+                    <span class="badge badge-fail">${a.categoria || '?'}</span>
+                </div>
+            </div>
+            <div style="color:#fca5a5;font-size:.9rem;margin-bottom:6px">❌ ${a.teste || '?'}</div>
+            <div style="color:#94a3b8;font-size:.82rem;margin-bottom:8px">${a.detalhe || ''}</div>`;
+        
+        // Pilar violado
+        if (a.pilar_violado) {
+            html += `<div style="padding:6px 10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:6px;font-size:.82rem;margin-bottom:8px">
+                <b style="color:#a78bfa">📐 Pilar:</b> <span style="color:#c4b5fd">${a.pilar_violado}</span>
+            </div>`;
+        }
+        
+        // Caminho pelo código
+        if (caminho.length > 0) {
+            html += `<div style="background:#020617;border-radius:6px;padding:8px 12px;font-family:monospace;font-size:.78rem;margin-bottom:8px">`;
+            caminho.forEach((step, i) => {
+                const arrow = i > 0 ? ' → ' : '';
+                html += `<span style="color:${i===caminho.length-1?'#f87171':'#60a5fa'}">${arrow}${step.passo}</span> <span style="color:#475569">(${step.detalhe})</span>`;
+            });
+            html += `</div>`;
+        }
+        
+        // Contexto compilado
+        if (ctx.como_corrigir) {
+            // Prepara texto para cópia da IA
+            const iaText = `O que aconteceu: ${ctx.o_que_aconteceu}\\nOnde: ${ctx.onde_no_codigo}\\nComo corrigir: ${ctx.como_corrigir}\\nPilar: ${ctx.pilar_guia}\\nDetalhe do erro: ${a.detalhe}\\nCaminho:\\n${caminho.map(c => c.passo + ': ' + c.detalhe).join('\\n')}`;
+            
+            html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem">
+                <div style="padding:8px;background:rgba(59,130,246,.06);border-radius:6px">
+                    <b style="color:#60a5fa">📍 Onde:</b> ${ctx.onde_no_codigo || '?'}<br>
+                    <b style="color:#fbbf24">💡 O quê:</b> ${ctx.o_que_aconteceu || '?'}
+                </div>
+                <div style="padding:8px;background:rgba(16,185,129,.06);border-radius:6px">
+                    <b style="color:#34d399">🔧 Como corrigir:</b> ${ctx.como_corrigir || '?'}<br>
+                    <b style="color:#a78bfa">📐 Guia:</b> ${ctx.pilar_guia || '?'}
+                </div>
+            </div>
+            <div style="margin-top:8px">
+                <button class="btn-primary btn-sm" onclick="navigator.clipboard.writeText(\`${iaText}\`); alert('Contexto copiado para IA!')">🤖 Copiar Contexto para IA</button>
+            </div>`;
+        }
+        
+        html += `</div>`;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+async function carregarPaginas(){
+    log('Carregando mapa de páginas do sistema...','system',utOut);
+    try{
+        const [pRes,cRes] = await Promise.all([
+            fetch('/dev/tester/api/unit/paginas'),
+            fetch('/dev/tester/api/unit/cobertura')
+        ]);
+        const pData = await pRes.json();
+        const cData = await cRes.json();
+        paginasCache = pData.paginas || [];
+        const cob = cData.cobertura || {};
+
+        document.getElementById('statPaginas').textContent = cob.total_paginas || 0;
+        document.getElementById('statBotoes').textContent = cob.total_botoes_mapeados || 0;
+        document.getElementById('statCampos').textContent = cob.total_campos_mapeados || 0;
+        document.getElementById('statModulos').textContent = cob.total_modulos || 0;
+
+        renderPaginas(paginasCache);
+        log(`${paginasCache.length} páginas carregadas.`,'success',utOut);
+    }catch(e){log(`Erro ao carregar: ${e.message}`,'error',utOut);}
+}
+
+function renderPaginas(paginas){
+    const tbody = document.getElementById('utTableBody');
+    tbody.innerHTML = '';
+    paginas.forEach(p => {
+        const niveis = p.niveis_esperados.map(n =>
+            `<span class="badge badge-role">${n}</span>`
+        ).join('');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-weight:600">${p.nome}</td>
+            <td style="font-family:monospace;font-size:.8rem;color:var(--muted)">${p.rota}</td>
+            <td><span class="badge badge-pending">${p.modulo}</span></td>
+            <td style="text-align:center">${p.botoes.length}</td>
+            <td style="text-align:center">${p.formularios.length}</td>
+            <td>${niveis}</td>
+            <td style="white-space:nowrap">
+                <button class="btn-primary btn-sm" onclick="testarPagina('${p.id}')">Testar</button>
+                <button class="btn-warn btn-sm" style="margin-left:4px" onclick="window.open('/dev/tester/robo/${p.id}','_blank')">🤖 Robô</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+async function testarPagina(id){
+    log(`Executando testes para página: ${id} (role: ${currentRole})...`,'system',utOut);
+    try{
+        const r = await fetch('/dev/tester/api/unit/testar-pagina',{method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({pagina_id:id,role:currentRole})});
+        const d = await r.json();
+        if(d.status==='success'){
+            log(`✅ ${d.pagina}: ${d.passou} passou / ${d.falhou} falhou (${d.duracao_seg}s)`,'success',utOut);
+            mostrarDetalhe(d);
+            
+            // Armazena falhas para a aba Debug (NÃO renderiza aqui — lazy)
+            ultimaListaFalhas = [];
+            d.resultados.forEach(r => {
+                if(r.status === 'fail'){
+                    ultimaListaFalhas.push({
+                        pagina: d.pagina,
+                        rota: d.rota,
+                        categoria: r.cat,
+                        teste: r.teste,
+                        detalhe: r.detalhe
+                    });
+                }
+            });
+            _debugDirty = true; // Marca para renderizar quando o usuário abrir a aba Debug
+        }else log(d.message||'Erro','error',utOut);
+    }catch(e){log(`Falha: ${e.message}`,'error',utOut);}
+}
+
+function mostrarDetalhe(d){
+    const box = document.getElementById('utDetalhe');
+    box.style.display = 'block';
+    document.getElementById('utDetalheTitle').textContent = `Resultado: ${d.pagina} (${d.rota})`;
+    let html = `<p style="color:var(--muted);margin-bottom:.8rem">Role: <b>${d.role_testada}</b> | Total: <b>${d.total_testes}</b> | ✅ ${d.passou} | ❌ ${d.falhou} | ⏱ ${d.duracao_seg}s</p>`;
+    html += '<table class="ut-table"><thead><tr><th>Cat</th><th>Teste</th><th>Esperado</th><th>Status</th><th>Detalhe</th></tr></thead><tbody>';
+    d.resultados.forEach(r => {
+        const badge = r.status==='pass'?'badge-pass':'badge-fail';
+        const catBadge = {'RBAC':'🔐','Botões':'🔘','Formulário':'📝','Overflow':'📏','Segurança':'🛡️','Cross-Role':'👥','Dependência':'🔗'}[r.cat]||'🧪';
+        html += `<tr><td>${catBadge} ${r.cat||''}</td><td>${r.teste}</td><td style="color:var(--muted)">${r.esperado}</td>
+            <td><span class="badge ${badge}">${r.resultado}</span></td>
+            <td style="color:var(--muted);font-size:.8rem">${r.detalhe}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('utDetalheBody').innerHTML = html;
+    box.scrollIntoView({behavior:'smooth'});
+}
+
+/* ═══ Modal Helpers ═══ */
+const roleIcons = {admin:'👑',master:'⚡',tecnico:'🔧',secretario:'🏛',cliente:'👤'};
+const roleColors = {admin:'#7c3aed',master:'#2563eb',tecnico:'#0891b2',secretario:'#059669',cliente:'#d97706'};
+let modalResultCache = null;
+
+function abrirModal(){
+    const m = document.getElementById('testModal');
+    m.classList.add('active');
+    document.getElementById('tmSpinner').style.display='block';
+    document.getElementById('tmCloseWrap').style.display='none';
+    document.getElementById('tmResultsList').innerHTML='';
+    document.getElementById('tmTitle').textContent='Executando Bateria de Testes';
+    document.getElementById('tmSubtitle').textContent='Aguarde enquanto todos os níveis são validados...';
+    document.getElementById('tmProgressBar').style.width='0%';
+    document.getElementById('tmProgressLabel').textContent='Preparando...';
+    ['tmStatTotal','tmStatPass','tmStatFail','tmStatPages'].forEach(id=>document.getElementById(id).textContent='0');
+}
+
+function fecharModal(){
+    document.getElementById('testModal').classList.remove('active');
+    // Rola até o resultado global que já foi preenchido
+    const gBox = document.getElementById('utResultadoGlobal');
+    if(gBox) gBox.scrollIntoView({behavior:'smooth'});
+}
+
+function atualizarModalLevel(roleName, step, total){
+    const icon = roleIcons[roleName]||'🧪';
+    const cor = roleColors[roleName]||'#6366f1';
+    const badge = document.getElementById('tmLevelBadge');
+    badge.style.background = cor;
+    badge.innerHTML = `${icon} Testando: ${roleName.charAt(0).toUpperCase()+roleName.slice(1)}`;
+    const pct = Math.round((step/total)*100);
+    document.getElementById('tmProgressBar').style.width = pct+'%';
+    document.getElementById('tmProgressLabel').textContent = `Nível ${step} de ${total} — ${pct}% concluído`;
+}
+
+function adicionarResultadoModal(roleName, passed, failed, totalTests){
+    const icon = roleIcons[roleName]||'🧪';
+    const cor = roleColors[roleName]||'#6366f1';
+    const statusIcon = failed > 0 ? '❌' : '✅';
+    const list = document.getElementById('tmResultsList');
+    list.innerHTML += `<div class="tm-result-row">
+        <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:${cor};color:white;padding:3px 10px;border-radius:12px;font-size:.78rem;font-weight:600">${icon} ${roleName.toUpperCase()}</span>
+        </div>
+        <div style="display:flex;gap:12px;font-size:.85rem">
+            <span style="color:#34d399">✅ ${passed}</span>
+            <span style="color:${failed>0?'#f87171':'#475569'}">❌ ${failed}</span>
+            <span style="color:var(--muted)">(${totalTests} testes)</span>
+            <span>${statusIcon}</span>
+        </div>
+    </div>`;
+    list.scrollTop = list.scrollHeight;
+}
+
+function finalizarModal(totalPass, totalFail){
+    stopDynamicMessages();
+    document.getElementById('tmSpinner').style.display='none';
+    document.getElementById('tmCloseWrap').style.display='block';
+    document.getElementById('tmProgressBar').style.width='100%';
+    const ok = totalFail === 0;
+    document.getElementById('tmTitle').innerHTML = ok
+        ? '<span class="tm-done-icon">✅</span><br>Todos os Testes Passaram!'
+        : `<span class="tm-done-icon">⚠️</span><br>${totalFail} Falha${totalFail>1?'s':''} Detectada${totalFail>1?'s':''}`;
+    document.getElementById('tmSubtitle').textContent = `${totalPass} passaram • ${totalFail} falharam`;
+    document.getElementById('tmLevelBadge').innerHTML = ok ? '🎉 Concluído com Sucesso' : '🔍 Verifique os Detalhes';
+    document.getElementById('tmLevelBadge').style.background = ok ? '#059669' : '#dc2626';
+    document.getElementById('tmProgressLabel').textContent = '100% concluído';
+}
+
+const tmDynamicMessages = [
+    "Analisando permissões RBAC e Roles...",
+    "Executando payloads avançados (XSS, SQLi)...",
+    "Verificando segurança de formulários...",
+    "Validando limites de Overflow (Chaos Testing)...",
+    "Checando vulnerabilidades de Path Traversal...",
+    "Analisando proteção CSRF e Cookies...",
+    "Simulando ataques de CORS e Open Redirect...",
+    "Varrendo a rotação de Sessões Múltiplas...",
+    "Analisando aderência aos 12 Pilares TRPROC...",
+    "Calculando taxa de resiliência e blindagem..."
+];
+let tmMessageInterval = null;
+
+function startDynamicMessages() {
+    if(tmMessageInterval) clearInterval(tmMessageInterval);
+    let msgIdx = 0;
+    const sub = document.getElementById('tmSubtitle');
+    sub.innerHTML = `<span style="color:#fbbf24">⏳ ${tmDynamicMessages[msgIdx]}</span>`;
+    tmMessageInterval = setInterval(() => {
+        msgIdx = (msgIdx + 1) % tmDynamicMessages.length;
+        sub.innerHTML = `<span style="color:#fbbf24; animation: fadeIn 0.3s ease-in-out;">⏳ ${tmDynamicMessages[msgIdx]}</span>`;
+    }, 1500); // Muda a mensagem a cada 1.5s
+}
+
+function stopDynamicMessages() {
+    if(tmMessageInterval) clearInterval(tmMessageInterval);
+    tmMessageInterval = null;
+}
+
+async function runWithConcurrency(tasks, limit) {
+    const results = [];
+    let i = 0;
+    const worker = async () => {
+        while (i < tasks.length) {
+            const taskIndex = i++;
+            results[taskIndex] = await tasks[taskIndex]();
+        }
+    };
+    const workers = [];
+    for (let w = 0; w < limit; w++) workers.push(worker());
+    await Promise.all(workers);
+    return results;
+}
+
+async function executarTodosTestes(){
+    if (!acquireLock('Testes Unitários E2E')) return;
+    const isTodos = currentRole === 'todos';
+    const roles = isTodos ? ['admin','master','tecnico','secretario','cliente'] : [currentRole];
+    const gBox = document.getElementById('utResultadoGlobal');
+    gBox.style.display='block';
+    gBox.innerHTML='<span style="color:#fbbf24">⏳ Executando testes...</span>';
+    log(`▶ Executando testes na Bateria E2E (${isTodos?'TODOS OS NÍVEIS':currentRole})...`,'system',utOut);
+
+    abrirModal();
+
+    let allDetalhes = [];
+    let allFalhas = [];
+    let gTotal=0, gPass=0, gFail=0, gPages=0;
+    const t0Global = performance.now();
+
+    for(let i=0; i<roles.length; i++){
+        const role = roles[i];
+        atualizarModalLevel(role, i, roles.length);
+        log(`  🔄 Testando nível: ${role.toUpperCase()}...`,'system',utOut);
+        startDynamicMessages();
+
+        const list = document.getElementById('tmResultsList');
+        list.innerHTML = `<div style="font-weight:bold; color:var(--text); margin-bottom:10px; font-size:1rem;">Checklist de Páginas:</div>`;
+
+        let rolePass = 0, roleFail = 0, roleTotal = 0;
+        const t0Role = performance.now();
+
+        // 1. Prepara a lista visual para manter a ordem intacta
+        for (let j=0; j<paginasCache.length; j++) {
+            const p = paginasCache[j];
+            const itemId = `chk-${role}-${j}`;
+            list.innerHTML += `<div id="${itemId}" style="padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: var(--muted); animation: fadeIn 0.3s ease-in-out;">
+                <span style="display:inline-block;width:20px;text-align:center">🕒</span> Aguardando <b>${p.nome}</b> <span style="font-size:0.75rem;opacity:0.6">(${p.rota})</span>...
+            </div>`;
+        }
+        list.scrollTop = list.scrollHeight;
+
+        // 2. Define o limite de assincronicidade baseado no Hardware do usuário
+        const cores = navigator.hardwareConcurrency || 4;
+        const maxAsync = Math.min(cores, 8); // Até 8 paralelos — funciona bem com Flask/MySQL local
+        log(`  🚀 Hardware Concurrency (${cores} cores): Rodando ${maxAsync} testes em paralelo.`,'info',utOut);
+
+        // 3. Monta a fila de tarefas assíncronas
+        const tasks = paginasCache.map((p, j) => async () => {
+            const itemId = `chk-${role}-${j}`;
+            document.getElementById(itemId).innerHTML = `<span style="display:inline-block;width:20px;text-align:center;color:#fbbf24">⚙️</span> Testando <b>${p.nome}</b> <span style="font-size:0.75rem;opacity:0.6">(${p.rota})</span>...`;
+
+            try {
+                const t0Page = performance.now();
+                const r = await fetch('/dev/tester/api/unit/testar-pagina',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({pagina_id: p.id, role})
+                });
+                const d = await r.json();
+                const msPage = Math.round(performance.now() - t0Page);
+
+                let icon = '✅';
+                let color = '#34d399';
+                let falhaMsg = '';
+
+                if (d.status === 'success') {
+                    if (d.falhou > 0) {
+                        icon = '❌';
+                        color = '#f87171';
+                        const f = d.resultados.find(res => res.status === 'fail');
+                        falhaMsg = f ? `<br><span style="color:#f87171;font-size:0.75rem;margin-left:24px">↳ Falha em ${f.cat}: ${f.detalhe}</span>` : '';
+                    } else if (d.passou === 0 && d.falhou === 0) {
+                        icon = '⚠️';
+                        color = '#fbbf24';
+                        falhaMsg = '<br><span style="color:#fbbf24;font-size:0.75rem;margin-left:24px">↳ Nenhum teste aplicável mapeado</span>';
+                    }
+
+                    document.getElementById(itemId).innerHTML = `<span style="display:inline-block;width:20px;text-align:center">${icon}</span> <span style="color:${color}"><b>${p.nome}</b></span> <span style="font-size:0.75rem;color:var(--muted)">(${p.rota})</span> <span style="color:#6b7280;font-size:0.75rem;margin-left:6px">[${msPage}ms]</span>${falhaMsg}`;
+
+                    gPass += d.passou;
+                    gFail += d.falhou;
+                    gTotal += (d.passou + d.falhou);
+                    gPages++;
+
+                    rolePass += d.passou;
+                    roleFail += d.falhou;
+                    roleTotal += (d.passou + d.falhou);
+
+                    d.resultados.forEach(res => {
+                        if(res.status === 'fail'){
+                            allFalhas.push({
+                                pagina: d.pagina,
+                                rota: d.rota,
+                                categoria: res.cat,
+                                teste: res.teste,
+                                detalhe: res.detalhe
+                            });
+                        }
+                    });
+                    allDetalhes.push(d);
+                } else {
+                    document.getElementById(itemId).innerHTML = `<span style="display:inline-block;width:20px;text-align:center">❗</span> <span style="color:#f87171"><b>${p.nome}</b> - Erro Crítico: ${d.message||'Desconhecido'}</span>`;
+                    gFail++;
+                    gTotal++;
+                }
+            } catch(e) {
+                document.getElementById(itemId).innerHTML = `<span style="display:inline-block;width:20px;text-align:center">❗</span> <span style="color:#f87171"><b>${p.nome}</b> - Erro de Conexão: ${e.message}</span>`;
+                gFail++;
+                gTotal++;
+            }
+
+            document.getElementById('tmStatTotal').textContent = gTotal;
+            document.getElementById('tmStatPass').textContent = gPass;
+            document.getElementById('tmStatFail').textContent = gFail;
+            document.getElementById('tmStatPages').textContent = gPages;
+        });
+
+        // 4. Executa as tarefas com controle de concorrência
+        await runWithConcurrency(tasks, maxAsync);
+        
+        const secRole = ((performance.now() - t0Role)/1000).toFixed(2);
+        adicionarResultadoModal(role, rolePass, roleFail, roleTotal);
+        log(`  ✅ ${role.toUpperCase()}: ${rolePass} passaram, ${roleFail} falharam. (Em ${secRole}s)`, roleFail>0?'error':'success', utOut);
+    }
+
+    atualizarModalLevel(roles[roles.length-1], roles.length, roles.length);
+    finalizarModal(gPass, gFail);
+
+    const secGlobal = ((performance.now() - t0Global)/1000).toFixed(2);
+
+    ultimaListaFalhas = allFalhas;
+    _debugDirty = true; // Marca para renderizar quando o usuário abrir a aba Debug
+    releaseLock();
+
+    const cor = gFail>0?'var(--danger)':'var(--success)';
+    gBox.style.borderColor = cor;
+    let falhaHtml = '';
+    if(allFalhas.length > 0){
+        falhaHtml = `<div style="margin-top:10px"><b style="color:#f87171">📋 Lista de Falhas (${allFalhas.length}):</b>
+        <table class="ut-table" style="margin-top:6px"><thead><tr><th>Página</th><th>Cat</th><th>Teste</th><th>Detalhe</th></tr></thead><tbody>`;
+        allFalhas.slice(0,5).forEach(f => {
+            falhaHtml += `<tr><td>${f.pagina}</td><td>${f.categoria}</td><td>${f.teste}</td><td style="color:var(--muted);font-size:.8rem">${f.detalhe}</td></tr>`;
+        });
+        if(allFalhas.length > 5){
+            falhaHtml += `<tr><td colspan="4" style="text-align:center;color:var(--muted)">+ ${allFalhas.length - 5} falhas não exibidas...</td></tr>`;
+        }
+        falhaHtml += '</tbody></table></div>';
+        falhaHtml += `<div style="margin-top:16px"><button class="btn-warn" onclick="switchTab('debug')" style="width:auto;padding:.6rem 1.5rem">🐞 Abrir Módulo de Debug para Ver Todos</button></div>`;
+    }
+    const dataStr = new Date().toLocaleString('pt-BR');
+    gBox.innerHTML = `
+        <div style="font-weight:700;font-size:1.1rem;color:${cor};margin-bottom:6px">
+            ${gFail>0?'❌ Falhas Detectadas':'✅ Todos os Testes Passaram!'} <span style="font-size:0.85rem;color:var(--muted);font-weight:normal;margin-left:8px">(Tempo Total: ${secGlobal}s)</span>
+        </div>
+        <div style="color:var(--muted)">
+            📄 ${gPages} páginas | 🧪 ${gTotal} testes | ✅ ${gPass} ok | ❌ ${gFail} falha | 👤 ${isTodos?'Todos os Níveis':currentRole} | 📅 ${dataStr}
+        </div>${falhaHtml}`;
+    log(`✅ Testes completos: ${gPass} passaram, ${gFail} falharam.`, gFail>0?'error':'success', utOut);
+}
+
+// Auto-load ao entrar (sem auto-refresh global — só ativa na aba Debug)
+document.addEventListener('DOMContentLoaded', () => {
+    // NÃO ativa auto-refresh automaticamente — só quando a aba Debug for aberta
+    // Isso evita polling desnecessário e sobrecarga do servidor
+});
+
+/* ═══════════════════════════════════════
+   MÓDULO DE DEBUG
+   ═══════════════════════════════════════ */
+const debugOut = document.getElementById('debugConsole');
+let debugAutoInterval = null;
+
+function dLog(msg, type='info') { log(msg, type, debugOut); }
+function clearDebugConsole() { debugOut.innerHTML=''; dLog('Console limpo.','system'); }
+
+function switchDebugSub(sub) {
+    ['erros','ameacas','falhas'].forEach(s => {
+        const el = document.getElementById('debugSub' + s.charAt(0).toUpperCase() + s.slice(1));
+        const btn = document.getElementById('dSub' + s.charAt(0).toUpperCase() + s.slice(1));
+        if (el) el.style.display = s === sub ? 'block' : 'none';
+        if (btn) btn.classList.toggle('active', s === sub);
+    });
+    // Fix IDs
+    document.getElementById('debugSubErros').style.display = sub === 'erros' ? 'block' : 'none';
+    document.getElementById('debugSubAmeacas').style.display = sub === 'ameacas' ? 'block' : 'none';
+    document.getElementById('debugSubFalhas').style.display = sub === 'falhas' ? 'block' : 'none';
+    document.querySelectorAll('#tab-debug .tab').forEach(t => t.classList.remove('active'));
+    if (sub === 'erros') document.getElementById('dSubErros').classList.add('active');
+    if (sub === 'ameacas') document.getElementById('dSubAmeacas').classList.add('active');
+    if (sub === 'falhas') document.getElementById('dSubFalhas').classList.add('active');
+}
+
+async function carregarDebug() {
+    dLog('Carregando logs de debug...', 'system');
+    try {
+        const [errosRes, ameacasRes, statsRes] = await Promise.all([
+            fetch('/dev/tester/api/debug/erros?limit=500'),
+            fetch('/dev/tester/api/debug/ameacas?limit=500'),
+            fetch('/dev/tester/api/debug/stats')
+        ]);
+        const errosData = await errosRes.json();
+        const ameacasData = await ameacasRes.json();
+        const statsData = await statsRes.json();
+
+        // Stats
+        document.getElementById('dStatErros').textContent = statsData.total_erros || 0;
+        document.getElementById('dStatAmeacas').textContent = statsData.total_ameacas || 0;
+        document.getElementById('dStatUltimo').textContent = statsData.ultimo_erro ? statsData.ultimo_erro.timestamp : '—';
+        document.getElementById('dStatUltimaAmeaca').textContent = statsData.ultima_ameaca ? statsData.ultima_ameaca.tipo : '—';
+
+        // Erros
+        renderDebugErros(errosData.erros || []);
+        // Ameaças
+        renderDebugAmeacas(ameacasData.ameacas || []);
+
+        dLog(`${errosData.total || 0} erros e ${ameacasData.total || 0} ameaças carregados.`, 'success');
+    } catch (e) {
+        dLog(`Erro ao carregar debug: ${e.message}`, 'error');
+    }
+}
+
+function renderDebugErros(erros) {
+    const container = document.getElementById('debugErrosContainer');
+    if (!erros.length) {
+        container.innerHTML = '<p style="color:var(--success);text-align:center;padding:2rem;font-weight:bold;font-size:1.1rem">✅ Nenhum erro capturado. O sistema está estável.</p>';
+        return;
+    }
+
+    // Agrupar erros por tipo para melhor visualização
+    const grupos = {};
+    erros.forEach(e => {
+        const tipo = e.erro_tipo || 'Desconhecido';
+        if (!grupos[tipo]) grupos[tipo] = [];
+        grupos[tipo].push(e);
+    });
+
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">`;
+    html += `<b style="color:#f87171;font-size:1.05rem">🐞 ${erros.length} Erros Capturados</b>`;
+    html += `<span style="color:var(--muted);font-size:.78rem">${Object.keys(grupos).length} tipos distintos</span>`;
+    html += `</div>`;
+
+    // Renderiza cada grupo com cabeçalho visual
+    Object.keys(grupos).forEach(tipo => {
+        const lista = grupos[tipo];
+        const cor = lista[0].status_code >= 500 ? '#f87171' : lista[0].status_code >= 400 ? '#fbbf24' : '#60a5fa';
+        html += `<div style="margin-bottom:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">`;
+        html += `<div style="background:rgba(255,255,255,.04);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.06)">`;
+        html += `<span style="color:${cor};font-weight:700;font-size:.9rem">${tipo}</span>`;
+        html += `<span class="badge" style="background:rgba(239,68,68,.15);color:#f87171">${lista.length}x</span>`;
+        html += `</div>`;
+        html += `<table class="ut-table" style="margin:0"><thead><tr><th style="width:160px">📅 Quando</th><th>HTTP</th><th>Rota</th><th>Mensagem</th><th>Causa</th><th></th></tr></thead><tbody>`;
+        lista.forEach(e => {
+            const ctx = e.contexto || {};
+            // Formata o timestamp de forma legível
+            let ts = e.timestamp || '';
+            try {
+                const d = new Date(ts);
+                if (!isNaN(d)) ts = d.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+            } catch(_) {}
+            html += `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+                <td style="white-space:nowrap;font-size:.78rem;color:#94a3b8">🕐 ${ts}</td>
+                <td><span class="badge badge-fail" style="font-size:.75rem">${e.status_code}</span></td>
+                <td style="font-family:monospace;font-size:.75rem;color:#60a5fa">${e.metodo} ${e.rota}</td>
+                <td style="font-size:.82rem;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(e.erro_msg||'').replace(/"/g,'&quot;')}">${(e.erro_msg||'').substring(0,100)}${(e.erro_msg||'').length>100?'…':''}</td>
+                <td style="font-size:.78rem;color:#94a3b8">${ctx.resumo || '—'}</td>
+                <td><button class="btn-primary btn-sm" onclick="verDetalheErro(${e.id})" style="padding:3px 8px;font-size:.72rem">🔍 Ver</button></td>
+            </tr>`;
+        });
+        html += '</tbody></table></div>';
+    });
+
+    container.innerHTML = html;
+}
+
+function renderDebugAmeacas(ameacas) {
+    const container = document.getElementById('debugAmeacasContainer');
+    if (!ameacas.length) {
+        container.innerHTML = '<p style="color:var(--success);text-align:center;padding:2rem;font-weight:bold;font-size:1.1rem">✅ Nenhuma ameaça detectada. Perímetro seguro.</p>';
+        return;
+    }
+    const sevColor = {'ALTA':'#f87171','MÉDIA':'#fbbf24','BAIXA':'#94a3b8'};
+    let html = `<b style="color:#fbbf24">🛡️ Ameaças Detectadas (${ameacas.length}):</b>`;
+    html += `<table class="ut-table" style="margin-top:10px"><thead><tr><th>Hora</th><th>Severidade</th><th>Tipo</th><th>IP</th><th>Path</th><th>Descrição</th><th>Ação</th></tr></thead><tbody>`;
+    ameacas.forEach(a => {
+        html += `<tr>
+            <td style="white-space:nowrap;font-size:.8rem">${a.timestamp}</td>
+            <td><span class="badge" style="background:rgba(239,68,68,.15);color:${sevColor[a.severidade]||'#94a3b8'}">${a.severidade}</span></td>
+            <td style="font-weight:600;color:#fca5a5">${a.tipo}</td>
+            <td style="font-family:monospace;font-size:.75rem">${a.ip}</td>
+            <td style="font-family:monospace;font-size:.75rem;color:var(--muted)">${a.path}</td>
+            <td style="font-size:.82rem">${(a.descricao||'').substring(0,100)}</td>
+            <td style="font-size:.8rem;color:#94a3b8">${a.acao || '—'}</td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+async function verDetalheErro(errorId) {
+    dLog(`Carregando detalhe do erro #${errorId}...`, 'system');
+    try {
+        const res = await fetch(`/dev/tester/api/debug/erro/${errorId}`);
+        const data = await res.json();
+        if (data.status !== 'success') { dLog('Erro não encontrado.','error'); return; }
+        const e = data.erro;
+        const ctx = e.contexto || {};
+        const box = document.getElementById('debugDetalheErro');
+        box.style.display = 'block';
+
+        // Monta o caminho de debug visual
+        let caminhoHtml = '';
+        if (e.caminho_debug && e.caminho_debug.length) {
+            caminhoHtml = `<div style="margin:12px 0"><b style="color:#60a5fa">📍 Caminho de Debug (da requisição ao erro):</b>
+            <div style="background:#020617;border:1px solid var(--glass-border);border-radius:8px;padding:12px;margin-top:8px;font-family:monospace;font-size:.82rem">`;
+            e.caminho_debug.forEach((step, i) => {
+                const isLast = i === e.caminho_debug.length - 1;
+                const arrow = i > 0 ? '<div style="color:#475569;padding:2px 0">  ↓</div>' : '';
+                caminhoHtml += `${arrow}<div style="color:${isLast?'#f87171':'#e2e8f0'};padding:3px 0">
+                    ${isLast?'❌':'➡️'} <span style="color:#60a5fa">${step.arquivo}</span>
+                    → <span style="color:#34d399">${step.funcao}()</span>
+                    linha <span style="color:#fbbf24">${step.linha}</span>
+                    ${step.codigo ? `<br><span style="color:#475569;margin-left:28px">${step.codigo}</span>` : ''}
+                </div>`;
+            });
+            caminhoHtml += '</div></div>';
+        }
+
+        document.getElementById('debugDetalheBody').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0">
+                <div><span style="color:var(--muted)">Tipo:</span> <b style="color:#f87171">${e.erro_tipo}</b></div>
+                <div><span style="color:var(--muted)">Status:</span> <span class="badge badge-fail">${e.status_code}</span></div>
+                <div><span style="color:var(--muted)">Rota:</span> <code>${e.metodo} ${e.rota}</code></div>
+                <div><span style="color:var(--muted)">IP:</span> ${e.ip}</div>
+                <div><span style="color:var(--muted)">Hora:</span> ${e.timestamp}</div>
+                <div><span style="color:var(--muted)">User-Agent:</span> <span style="font-size:.75rem">${(e.user_agent||'').substring(0,60)}</span></div>
+            </div>
+            <div style="margin:12px 0;padding:12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px">
+                <b style="color:#f87171">Mensagem:</b> ${e.erro_msg}
+            </div>
+            ${caminhoHtml}
+            <div style="margin:12px 0;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="padding:12px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px">
+                    <b style="color:#60a5fa">📋 Diagnóstico</b><br>
+                    <span style="color:var(--muted);font-size:.85rem">${ctx.resumo || '—'}</span><br><br>
+                    <b style="color:#fbbf24">💡 Possível Causa</b><br>
+                    <span style="color:var(--muted);font-size:.85rem">${ctx.possivel_causa || '—'}</span>
+                </div>
+                <div style="padding:12px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px">
+                    <b style="color:#34d399">🔧 Sugestão de Fix</b><br>
+                    <span style="color:var(--muted);font-size:.85rem">${ctx.sugestao_fix || '—'}</span><br><br>
+                    <b style="color:#a78bfa">📐 Pilar Relacionado</b><br>
+                    <span style="color:var(--muted);font-size:.85rem">${ctx.pilar_relacionado || '—'}</span>
+                </div>
+            </div>
+            
+            <div style="margin:12px 0">
+                <button class="btn-primary" onclick="copiarContextoIA(${errorId})" style="width:auto;padding:.6rem 1.2rem;border-radius:8px;font-size:.85rem">🤖 Copiar Contexto para IA (Markdown)</button>
+            </div>
+            <details style="margin-top:12px">
+                <summary style="cursor:pointer;color:var(--muted);font-size:.85rem">📜 Traceback Completo (clique para expandir)</summary>
+                <pre style="background:#020617;color:#f87171;padding:12px;border-radius:8px;font-size:.75rem;overflow-x:auto;margin-top:8px;max-height:300px;overflow-y:auto">${e.traceback_completo || 'Não disponível'}</pre>
+            </details>`;
+        box.scrollIntoView({behavior:'smooth'});
+        dLog(`Detalhe do erro #${errorId} carregado.`, 'success');
+        
+        // Armazena temporariamente o erro atual para o botão copiar
+        window._currentErrorDetails = e;
+    } catch (err) { dLog(`Falha: ${err.message}`, 'error'); }
+}
+
+function copiarContextoIA(errorId) {
+    const e = window._currentErrorDetails;
+    if (!e || e.id !== errorId) return;
+    
+    const ctx = e.contexto || {};
+    let md = `## Erro TRPROC: ${e.erro_tipo}\\n\\n`;
+    md += `**Diagnóstico:** ${ctx.resumo || '—'}\\n`;
+    md += `**Possível Causa:** ${ctx.possivel_causa || '—'}\\n`;
+    md += `**Sugestão de Fix:** ${ctx.sugestao_fix || '—'}\\n`;
+    md += `**Pilar Relacionado:** ${ctx.pilar_relacionado || '—'}\\n\\n`;
+    
+    if (e.caminho_debug && e.caminho_debug.length) {
+        md += `### Caminho do Código:\\n\`\`\`text\\n`;
+        e.caminho_debug.forEach((step, i) => {
+            md += `[${i+1}] ${step.arquivo} -> ${step.funcao}() (linha ${step.linha})\\n`;
+            if (step.codigo) md += `    Código: ${step.codigo}\\n`;
+        });
+        md += `\`\`\`\\n\\n`;
+    }
+    
+    md += `### Traceback Parcial:\\n\`\`\`python\\n${(e.traceback_completo||'').split('\\n').slice(-15).join('\\n')}\\n\`\`\`\\n`;
+    
+    navigator.clipboard.writeText(md).then(() => {
+        alert('Contexto copiado para IA!');
+    });
+}
+
+async function limparLogsDebug() {
+    dLog('Limpando todos os logs...', 'system');
+    try {
+        await fetch('/dev/tester/api/debug/limpar', {method:'POST'});
+        dLog('Logs limpos com sucesso.', 'success');
+        carregarDebug();
+    } catch (e) { dLog(`Erro: ${e.message}`, 'error'); }
+}
+
+function baixarArquivoLogs() {
+    dLog('Baixando arquivo estruturado de logs...', 'system');
+    window.location.href = '/dev/tester/api/debug/exportar?limit=1000';
+}
+
+function toggleAutoRefresh() {
+    if (document.getElementById('debugAutoRefresh').checked) {
+        debugAutoInterval = setInterval(carregarDebug, 5000);
+        dLog('Auto-refresh ativado (5s).', 'system');
+    } else {
+        clearInterval(debugAutoInterval);
+        debugAutoInterval = null;
+        dLog('Auto-refresh desativado.', 'system');
+    }
+}
+
+/* ── ISOLAMENTO E TDD (Test Playground) ── */
+const isoOut = document.getElementById('isoConsole');
+function isoLog(msg, tipo='info') {
+    const c = tipo==='error'?'#f87171':tipo==='success'?'#34d399':tipo==='system'?'#fbbf24':'#60a5fa';
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.style.color = c;
+    div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    isoOut.appendChild(div);
+    isoOut.scrollTop = isoOut.scrollHeight;
+}
+function clearIsoConsole() {
+    isoOut.innerHTML = '<div class="log-entry log-system">Console de Isolamento limpo.</div>';
+}
+
+async function iniciarIsolamento() {
+    const titulo = document.getElementById('isoTitle').value.trim();
+    const passos = document.getElementById('isoSteps').value.trim();
+    const erroTxt = document.getElementById('isoError').value.trim();
+
+    if(!titulo || !erroTxt) {
+        alert("O Título e a Mensagem de Erro são obrigatórios!");
+        return;
+    }
+
+    abrirScanModal('🔬 Isolamento de Bug', 'A IA está analisando a Stacktrace e gerando a correção...', '#0ea5e9', 3);
+    isoLog(`Iniciando análise para: ${titulo}`, 'system');
+
+    try {
+        atualizarScanModal(0, 3, '⚙️ Etapa 1: Preparando Mock', 'Isolando dependências e injetando dados simulados...');
+        await new Promise(r => setTimeout(r, 1000));
+        
+        atualizarScanModal(1, 3, '🧠 Etapa 2: Análise IA', 'Construindo script TDD a partir da stacktrace...');
+        
+        const res = await fetch('/dev/tester/api/isolation/create-test', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ titulo, passos, erro: erroTxt })
+        });
+        
+        const data = await res.json();
+        
+        if(!res.ok) throw new Error(data.erro || 'Falha ao processar a requisição de isolamento.');
+        
+        atualizarScanModal(2, 3, '▶️ Etapa 3: Executando', 'Rodando a suíte recém gerada em ambiente Sandbox...');
+        await new Promise(r => setTimeout(r, 1200));
+
+        isoLog(data.mensagem || 'Teste gerado e executado com sucesso.', 'success');
+        adicionarResultadoScan('✅ Sucesso', 'TDD Criado', 'Corrigido', 'OK', '#34d399');
+        concluirScanModal('🔬 Teste de Isolamento Concluído', data.mensagem);
+        
+        // Limpar inputs
+        document.getElementById('isoTitle').value = '';
+        document.getElementById('isoSteps').value = '';
+        document.getElementById('isoError').value = '';
+        
+        carregarAcervoIsolamento();
+
+    } catch(err) {
+        isoLog(`Falha na geração: ${err.message}`, 'error');
+        concluirScanModal('❌ Erro no Isolamento', err.message);
+    }
+}
+
+async function carregarAcervoIsolamento() {
+    const list = document.getElementById('isoAcervoList');
+    list.innerHTML = '<i>Carregando...</i>';
+    try {
+        const res = await fetch('/dev/tester/api/isolation/list');
+        const data = await res.json();
+        
+        if(!data.acervo || data.acervo.length === 0) {
+            list.innerHTML = '<i>Nenhum erro salvo ainda.</i>';
+            return;
+        }
+        
+        let html = '';
+        data.acervo.forEach(item => {
+            html += `<div style="padding:10px;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="color:white;font-weight:600">${item.titulo}</div>
+                    <div style="font-size:0.75rem;color:var(--muted)">Criado em: ${item.data}</div>
+                </div>
+                <div class="badge badge-pass">Validado</div>
+            </div>`;
+        });
+        list.innerHTML = html;
+        
+    } catch(err) {
+        list.innerHTML = `<i style="color:#f87171">Erro ao buscar: ${err.message}</i>`;
+    }
+}
+
+// Carregar histórico ao iniciar se já estiver na aba (ou pode esperar clicar)
+
+/* ═══════════════════════════════════════════════
+   TESTES UNITÁRIOS PERSONALIZADOS (Nova Aba)
+   Persistidos em localStorage para não perder
+   ═══════════════════════════════════════════════ */
+const UT_STORAGE_KEY = 'trproc_testes_unitarios';
+const utNewOut = document.getElementById('utNewConsole');
+
+function _getTestesUnitarios() {
+    try { return JSON.parse(localStorage.getItem(UT_STORAGE_KEY)) || []; }
+    catch(e) { return []; }
+}
+
+function _salvarTestesUnitarios(lista) {
+    localStorage.setItem(UT_STORAGE_KEY, JSON.stringify(lista));
+}
+
+function adicionarTesteUnitario() {
+    const nome = document.getElementById('utNewName').value.trim();
+    const rota = document.getElementById('utNewRota').value.trim();
+    const method = document.getElementById('utNewMethod').value;
+    const statusEsperado = parseInt(document.getElementById('utNewStatus').value) || 200;
+    const contains = document.getElementById('utNewContains').value.trim();
+    const body = document.getElementById('utNewBody').value.trim();
+
+    if (!nome || !rota) {
+        alert('⚠️ Preencha pelo menos o Nome e a Rota do teste.');
+        return;
+    }
+
+    const testes = _getTestesUnitarios();
+    testes.push({
+        id: Date.now(),
+        nome, rota, method, statusEsperado, contains, body,
+        resultado: null, // null=pendente, 'pass', 'fail'
+        ultimoStatus: null,
+        ultimoMs: null,
+        ultimoErro: null,
+        criadoEm: new Date().toISOString()
+    });
+    _salvarTestesUnitarios(testes);
+
+    // Limpa inputs
+    document.getElementById('utNewName').value = '';
+    document.getElementById('utNewRota').value = '';
+    document.getElementById('utNewContains').value = '';
+    document.getElementById('utNewBody').value = '';
+
+    log(`✅ Teste "${nome}" adicionado (${method} ${rota} → esperado ${statusEsperado})`, 'success', utNewOut);
+    renderListaTestesUnitarios();
+}
+
+function removerTesteUnitario(id) {
+    let testes = _getTestesUnitarios();
+    testes = testes.filter(t => t.id !== id);
+    _salvarTestesUnitarios(testes);
+    renderListaTestesUnitarios();
+}
+
+function limparTestesUnitarios() {
+    if (!confirm('Tem certeza que deseja limpar todos os testes cadastrados?')) return;
+    _salvarTestesUnitarios([]);
+    renderListaTestesUnitarios();
+    log('🗑 Lista de testes unitários limpa.', 'system', utNewOut);
+}
+
+async function executarTestesUnitarios() {
+    if (!acquireLock('Testes Unitários')) return;
+    const testes = _getTestesUnitarios();
+    if (!testes.length) {
+        releaseLock();
+        alert('⚠️ Nenhum teste cadastrado. Adicione testes primeiro.');
+        return;
+    }
+
+    log(`\n▶ Executando ${testes.length} testes unitários...`, 'system', utNewOut);
+    let pass = 0, fail = 0;
+
+    for (let i = 0; i < testes.length; i++) {
+        const t = testes[i];
+        log(`  [${i+1}/${testes.length}] ${t.method} ${t.rota} — "${t.nome}"...`, 'info', utNewOut);
+
+        const inicio = performance.now();
+        try {
+            const opts = { method: t.method, headers: {} };
+            if (t.body && (t.method === 'POST' || t.method === 'PUT')) {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = t.body;
+            }
+
+            const res = await fetch(t.rota, opts);
+            const ms = Math.round(performance.now() - inicio);
+            t.ultimoMs = ms;
+            t.ultimoStatus = res.status;
+
+            let ok = res.status === t.statusEsperado;
+
+            // Verifica se o body contém o texto esperado
+            if (ok && t.contains) {
+                try {
+                    const texto = await res.text();
+                    if (!texto.includes(t.contains)) {
+                        ok = false;
+                        t.ultimoErro = `Body não contém "${t.contains}"`;
+                    }
+                } catch(e) {
+                    ok = false;
+                    t.ultimoErro = `Erro ao ler body: ${e.message}`;
+                }
+            }
+
+            if (ok) {
+                t.resultado = 'pass';
+                t.ultimoErro = null;
+                pass++;
+                log(`    ✅ PASSOU — HTTP ${res.status} em ${ms}ms`, 'success', utNewOut);
+            } else {
+                t.resultado = 'fail';
+                if (!t.ultimoErro) t.ultimoErro = `Esperado ${t.statusEsperado}, recebeu ${res.status}`;
+                fail++;
+                log(`    ❌ FALHOU — ${t.ultimoErro} (${ms}ms)`, 'error', utNewOut);
+            }
+        } catch(e) {
+            const ms = Math.round(performance.now() - inicio);
+            t.resultado = 'fail';
+            t.ultimoMs = ms;
+            t.ultimoStatus = 0;
+            t.ultimoErro = `Exceção: ${e.message}`;
+            fail++;
+            log(`    ❌ ERRO — ${e.message} (${ms}ms)`, 'error', utNewOut);
+        }
+    }
+
+    _salvarTestesUnitarios(testes);
+    renderListaTestesUnitarios();
+    releaseLock();
+
+    log(`\n══════════════════════════════════`, 'system', utNewOut);
+    log(`📊 Resultado: ${pass} passaram, ${fail} falharam de ${testes.length} total`, pass === testes.length ? 'success' : 'error', utNewOut);
+    log(`══════════════════════════════════\n`, 'system', utNewOut);
+}
+
+function renderListaTestesUnitarios() {
+    const testes = _getTestesUnitarios();
+    const container = document.getElementById('utNewList');
+
+    // Atualiza stats
+    const total = testes.length;
+    const passed = testes.filter(t => t.resultado === 'pass').length;
+    const failed = testes.filter(t => t.resultado === 'fail').length;
+    const pending = testes.filter(t => t.resultado === null).length;
+    document.getElementById('utNewTotal').textContent = total;
+    document.getElementById('utNewPass').textContent = passed;
+    document.getElementById('utNewFail').textContent = failed;
+    document.getElementById('utNewPending').textContent = pending;
+
+    if (!testes.length) {
+        container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:2rem">Nenhum teste cadastrado ainda. Use o formulário acima para adicionar.</p>';
+        return;
+    }
+
+    let html = `<table class="ut-table"><thead><tr>
+        <th>#</th><th>Nome</th><th>Método</th><th>Rota</th>
+        <th>Esperado</th><th>Resultado</th><th>Tempo</th><th>Erro</th><th></th>
+    </tr></thead><tbody>`;
+
+    testes.forEach((t, i) => {
+        const badgeClass = t.resultado === 'pass' ? 'badge-pass' : t.resultado === 'fail' ? 'badge-fail' : 'badge-pending';
+        const label = t.resultado === 'pass' ? '✅ Passou' : t.resultado === 'fail' ? '❌ Falhou' : '⏳ Pendente';
+        html += `<tr>
+            <td style="color:var(--muted)">${i+1}</td>
+            <td style="font-weight:600">${t.nome}</td>
+            <td><span class="badge" style="background:rgba(59,130,246,.15);color:#60a5fa">${t.method}</span></td>
+            <td style="font-family:monospace;font-size:.75rem;color:#94a3b8">${t.rota}</td>
+            <td style="text-align:center">${t.statusEsperado}</td>
+            <td><span class="badge ${badgeClass}">${label}</span></td>
+            <td style="color:var(--muted);font-size:.8rem">${t.ultimoMs !== null ? t.ultimoMs+'ms' : '—'}</td>
+            <td style="font-size:.75rem;color:#f87171;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(t.ultimoErro||'').replace(/"/g,'&quot;')}">${t.ultimoErro || ''}</td>
+            <td><button class="btn-danger btn-sm" onclick="removerTesteUnitario(${t.id})" style="padding:3px 8px;font-size:.72rem">🗑</button></td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// Renderiza ao carregar se houver testes salvos
+if (_getTestesUnitarios().length) {
+    renderListaTestesUnitarios();
+}
+
+/* ═══════════════════════════════════════
+   EDITOR DE TEMPLATES (JS LOGIC)
+   ═══════════════════════════════════════ */
+async function carregarTemplatesEditor() {
+    const tbody = document.getElementById('editorTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--muted)">🔄 Sincronizando...</td></tr>';
+    
+    try {
+        const res = await fetch('/dev/tester/api/templates');
+        const data = await res.json();
+        
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--muted)">Nenhum template encontrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(t => {
+            const tr = document.createElement('tr');
+            const roles = Array.isArray(t.niveis_esperados) ? t.niveis_esperados.join(', ') : '—';
+            tr.innerHTML = `
+                <td style="color:var(--primary); font-weight:700">${t.id}</td>
+                <td>${t.nome}</td>
+                <td style="font-family:monospace; font-size:0.75rem">${t.rota}</td>
+                <td style="color:var(--muted)">${t.modulo || '—'}</td>
+                <td><span class="badge badge-role">${roles}</span></td>
+                <td>
+                    <div style="display:flex; gap:5px">
+                        <button class="btn-primary btn-sm" style="background:#2563eb" onclick='editarTemplate(${JSON.stringify(t)})'>✏️</button>
+                        <button class="btn-danger btn-sm" onclick="deletarTemplate('${t.id}')">🗑</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#f87171">Erro: ${e.message}</td></tr>`;
+    }
+}
+
+function novoTemplate() {
+    document.getElementById('editorFormContainer').style.display = 'block';
+    document.getElementById('editorFormTitle').textContent = '✨ Novo Template de Teste';
+    document.getElementById('edId').value = '';
+    document.getElementById('edId').disabled = false;
+    document.getElementById('edNome').value = '';
+    document.getElementById('edRota').value = '';
+    document.getElementById('edModulo').value = '';
+    document.getElementById('edRoles').value = 'admin, master, tecnico, secretario, cliente';
+    document.getElementById('edId').focus();
+}
+
+function editarTemplate(t) {
+    document.getElementById('editorFormContainer').style.display = 'block';
+    document.getElementById('editorFormTitle').textContent = '✏️ Editar Template: ' + t.nome;
+    document.getElementById('edId').value = t.id;
+    document.getElementById('edId').disabled = true; // ID é a chave primária
+    document.getElementById('edNome').value = t.nome;
+    document.getElementById('edRota').value = t.rota;
+    document.getElementById('edModulo').value = t.modulo || '';
+    document.getElementById('edRoles').value = (t.niveis_esperados || []).join(', ');
+    window.scrollTo({ top: document.getElementById('editorFormContainer').offsetTop - 100, behavior: 'smooth' });
+}
+
+async function salvarTemplateEditor() {
+    const template = {
+        id: document.getElementById('edId').value.trim(),
+        nome: document.getElementById('edNome').value.trim(),
+        rota: document.getElementById('edRota').value.trim(),
+        modulo: document.getElementById('edModulo').value.trim(),
+        niveis_esperados: document.getElementById('edRoles').value.split(',').map(r => r.trim()).filter(r => r),
+        metodo: "GET" // Default
+    };
+
+    if (!template.id || !template.nome || !template.rota) {
+        alert('⚠️ ID, Nome e Rota são obrigatórios.');
+        return;
+    }
+
+    try {
+        const res = await fetch('/dev/tester/api/templates', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(template)
+        });
+        const d = await res.json();
+        if (d.status === 'success') {
+            log(`✅ Template "${template.nome}" salvo.`, 'success');
+            document.getElementById('editorFormContainer').style.display = 'none';
+            carregarTemplatesEditor();
+        } else {
+            alert('Erro: ' + d.message);
+        }
+    } catch(e) {
+        alert('Erro de conexão: ' + e.message);
+    }
+}
+
+async function deletarTemplate(id) {
+    if (!confirm(`Deseja realmente excluir o template "${id}"?\nIsso removerá a rota das varreduras automáticas.`)) return;
+    
+    try {
+        const res = await fetch(`/dev/tester/api/templates/${id}`, { method: 'DELETE' });
+        const d = await res.json();
+        if (d.status === 'success') {
+            log(`🗑 Template "${id}" removido.`, 'system');
+            carregarTemplatesEditor();
+        } else {
+            alert('Erro: ' + d.message);
+        }
+    } catch(e) {
+        alert('Erro de conexão: ' + e.message);
+    }
+}
+</script>
+
+<!-- ═══════ MODAL UNIVERSAL DE PROGRESSO DE SCAN ═══════ -->
+<div class="test-modal-overlay" id="scanModal" style="display:none">
+    <div class="test-modal" style="max-width:720px">
+        <div class="tm-header">
+            <div class="tm-spinner" id="smSpinner"></div>
+            <h2 id="smTitle">Executando Scan</h2>
+            <p id="smSubtitle" style="color:var(--muted);font-size:.85rem;margin-top:.3rem">Aguarde...</p>
+        </div>
+        <div style="text-align:center">
+            <div class="tm-level-badge" id="smBadge" style="background:#f59e0b;color:#000">
+                ⚡ Inicializando...
+            </div>
+        </div>
+        <div class="tm-progress-wrap">
+            <div class="tm-progress-bar" id="smProgressBar" style="width:0%"></div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:.8rem" id="smProgressLabel">
+            0 de 0 — 0% concluído
+        </div>
+        <div class="tm-stats-row">
+            <div class="tm-stat"><div class="n" id="smStatTotal" style="color:#e2e8f0">0</div><div class="l">Testados</div></div>
+            <div class="tm-stat"><div class="n" id="smStatPass" style="color:#34d399">0</div><div class="l">OK</div></div>
+            <div class="tm-stat"><div class="n" id="smStatWarn" style="color:#f59e0b">0</div><div class="l">Alerta</div></div>
+            <div class="tm-stat"><div class="n" id="smStatFail" style="color:#f87171">0</div><div class="l">Falha</div></div>
+        </div>
+        <div class="tm-results-list" id="smResultsList" style="max-height:350px;overflow-y:auto"></div>
+        <div style="text-align:center;margin-top:1rem;display:none" id="smCloseWrap">
+            <button class="btn-primary" onclick="fecharScanModal()" style="width:auto;padding:.7rem 2rem;border-radius:10px">✅ Fechar e Ver Resultados</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

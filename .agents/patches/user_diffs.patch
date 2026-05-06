@@ -1,0 +1,535 @@
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -14,6 +14,68 @@
+         if res:
+             return {'nome': res[0], 'brasao': res[1]}
+     return None
++    
++def atualizar_vinculos_processo(registro_id, dados_dinamicos):
++    """
++    Varre o JSON de respostas em busca de IDs de cadastros (autocompletes)
++    e cria links reais na tabela registros_vinculos para relatórios.
++    """
++    from extensions import db
++    from sqlalchemy import text
++    import json
++    
++    try:
++        # 1. Pega as perguntas que são autocomplete
++        sql_p = "SELECT id, autocomplete_config FROM ia_perguntas_config WHERE tipo = 'autocomplete' OR autocomplete_config IS NOT NULL"
++        perguntas = db.session.execute(text(sql_p)).fetchall()
++        
++        # 2. Limpa vínculos anteriores para este registro (para evitar duplicatas em edição)
+<truncated 2384 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -248,6 +248,16 @@
+                         
+                     if tenant:
+                         municipio_id_filtro = int(tenant)
++                    else:
++                        # Fallback Seguro: Se o Keycloak falhou em injetar, pega o fallback do banco 
++                        # validado pelo TRPROC_WEB.py
++                        fallback_mun = session.get('municipio_id')
++                        if fallback_mun:
++                            municipio_id_filtro = int(fallback_mun)
++                        else:
++                            # VULNERABILITY FIX: Se for cliente e não achar o município DE JEITO NENHUM,
++                            # trava num ID inexistente (0) para NÃO VAZAR todos os processos da base (comportamento admin).
+<truncated 362 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -387,10 +387,6 @@
+                                  func_vinc or 
+                                  'Aguardando Atribuição')
+ 
+-            if nome_st not in totais_map:
+-                totais_map[nome_st] = {'nome': nome_st, 'cor': cor_st, 'total': 0}
+-            totais_map[nome_st]['total'] = totais_map[nome_st].get('total', 0) + 1
+-
+             processos.append({
+                 'id':          row[0],
+                 'ano':         row[1] or datetime.now().year,
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -405,11 +405,26 @@
+     except Exception as e:
+         print(f"[PROCESSOS LOCAL] Erro: {e}")
+ 
+-    # Atualiza contagem do card 'Todos' e outros cards de filtro se necessário
++    # ── Contagem real do card 'Ver Todos' via SQL (sem LIMIT) ──
++    try:
++        _filtro_todos_pm = 'WHERE municipio_id_fk = :mun_id' if municipio_id_filtro else ''
++        _filtro_todos_r  = 'WHERE municipio_id_fk = :mun_id' if municipio_id_filtro else ''
++        _sql_total_real = f"""
++            SELECT COUNT(*) FROM (
++                SELECT id FROM processos_migrados {_filtro_todos_pm}
++                UNION ALL
++                SELECT id FROM registros {_filtro_todos_r}
++            ) todos
++        """
++        _params_total = {'mun_id': municipio_id_filtro} if municipio_id_filtro else {}
+<truncated 1013 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -712,8 +712,21 @@
+         if not isinstance(dados_dinamicos, dict):
+             dados_dinamicos = {}
+             
++        # Tentativa de encontrar o ID do responsável se for um objeto {val, label}
++        resp_id_final = usuario_id # Default é quem está logado
++        for key, val in dados_dinamicos.items():
++            # Se for um campo de responsável e tiver o formato de autocomplete
++            if ('responsavel' in key.lower() or 'dfd' in key.lower()) and isinstance(val, list) and len(val) > 0:
++                item = val[0]
++                if isinstance(item, dict) and item.get('val'):
++                    try:
++                        resp_id_final = int(item.get('val'))
++                        responsavel_dfd = item.get('label', responsavel_dfd)
+<truncated 552 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -746,7 +746,7 @@
+         except:
+             pass
+ 
+-        # 2. Fallback para o JWT Token
++        # 2. Fallback para o JWT Token ou Sessão
+         if not municipio_id:
+             token = session.get('jwt_token')
+             if token:
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -759,8 +759,18 @@
+                         municipio_id = int(tenant)
+                 except Exception:
+                     pass
+-        if not municipio_id:
+-            municipio_id = 1 # Fallback dev
++            
++            # Se ainda não encontrou, usa o fallback do banco de dados (injetado no TRPROC_WEB.py)
++            if not municipio_id:
++                fallback_mun = session.get('municipio_id')
++                if fallback_mun:
++                    municipio_id = int(fallback_mun)
++
++        if not municipio_id:
++            # FIX DE SEGURANÇA: NUNCA associar a 1 silenciosamente em prod. 
++            # Como é uma falha grave de tenant, devemos travar no 0 para estourar erro de FK
++            # ou usar o fallback apenas para DEV local
++            municipio_id = 0
+ 
+<truncated 981 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -805,8 +805,8 @@
+                 prox_num = int(res_max[0]) + 1
+                 
+             sql_insert = text("""
+-                INSERT INTO registros (status_id_fk, ano, usuario_id_fk, municipio_id_fk, data_modificacao, data_envio, dados_json, id_protocolo) 
+-                VALUES (:st_id, :ano, :usr, :mun, NOW(), NOW(), :djson, :id_prot)
++                INSERT INTO registros (status_id_fk, ano, usuario_id_fk, municipio_id_fk, data_modificacao, data_envio, dados_json, id_protocolo, responsavel_dfd_id_fk, name_dfd) 
++                VALUES (:st_id, :ano, :usr, :mun, NOW(), NOW(), :djson, :id_prot, :resp_id, :resp_nome)
+             """)
+             
+             result = db.session.execute(sql_insert, {
+@@ -814,7 +814,9 @@
+                 'usr': usuario_id,
+<truncated 1078 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -208,6 +208,12 @@
+     return jsonify({'status': 'success', 'data': lista})
+ 
+ 
++def hex_to_rgb(hex_str):
++    hex_str = hex_str.lstrip('#')
++    if len(hex_str) == 3:
++        hex_str = ''.join([c*2 for c in hex_str])
++    return ', '.join([str(int(hex_str[i:i+2], 16)) for i in (0, 2, 4)])
++
+ @client_form.route('/processos', methods=['GET'])
+ def listar_processos():
+     """
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -285,7 +285,7 @@
+ 
+         # Totais de Status (para o painel de filtros no topo)
+         sql_totais = f"""
+-            SELECT s.id, s.nome, s.cor_badge, COUNT(todos.id) as total, s.ordem_cliente
++            SELECT s.id, s.nome, s.cor_badge, COUNT(todos.id) as total, s.ordem_cliente, s.tipo, s.filtro_config
+             FROM status_processos s
+             LEFT JOIN (
+                 SELECT id, status_id_fk FROM processos_migrados {filtro_totais_pm}
+@@ -292,7 +292,7 @@
+                 SELECT id, status_id_fk FROM registros {filtro_totais_r}
+             ) todos ON todos.status_id_fk = s.id
+-            WHERE s.tipo IN ('form', 'filter') AND s.status = 'ativo'
+-            GROUP BY s.id, s.nome, s.cor_badge, s.ordem_cliente
++            WHERE s.status = 'ativo'
+<truncated 2348 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -359,7 +359,8 @@
+                 pm.dados_json, pm.status_id_fk, pm.municipio_id_fk,
+                 m.nome AS nome_municipio,
+                 s.nome AS nome_status, s.cor_badge AS cor_status,
+-                s.funcao_vinculada, s.nome_publico_alternativo
++                s.funcao_vinculada, s.nome_publico_alternativo,
++                pm.name_dfd, pm.responsavel_atual_nome
+             FROM processos_migrados pm
+             LEFT JOIN municipios m ON m.id = pm.municipio_id_fk
+             LEFT JOIN status_processos s ON s.id = pm.status_id_fk
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -373,7 +373,8 @@
+                 r.dados_json, r.status_id_fk, r.municipio_id_fk,
+                 m.nome AS nome_municipio,
+                 s.nome AS nome_status, s.cor_badge AS cor_status,
+-                s.funcao_vinculada, s.nome_publico_alternativo
++                s.funcao_vinculada, s.nome_publico_alternativo,
++                r.name_dfd, r.responsavel_atual_nome
+             FROM registros r
+             LEFT JOIN municipios m ON m.id = r.municipio_id_fk
+             LEFT JOIN status_processos s ON s.id = r.status_id_fk
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -421,7 +421,8 @@
+                 nome_st = nome_pub
+                 
+             # Extrair o Responsável atual com regra de transição baseada no autor do formulário
+-            responsavel_atual = (dados.get('responsavel_dfd') or 
++            responsavel_atual = (row[13] or 
++                                 dados.get('responsavel_dfd') or 
+                                  dados.get('responsavel') or 
+                                  dados.get('responsavel_nome') or 
+                                  dados.get('name_geral') or 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -439,7 +439,9 @@
+                 'objeto':      str(objeto_desc)[:120],
+                 'status_nome': nome_st,
+                 'status_cor':  cor_st,
++                'status_cor_rgb': hex_to_rgb(cor_st),
+                 'municipio':   nome_mun,
++                'responsavel_dfd': row[12] if len(row) > 12 else 'Não Identificado', # Pegando o name_dfd que adicionamos
+                 'responsavel_atual': responsavel_atual,
+                 'versao':      dados.get('versao', 'Migrado'),
+                 'reprocessos': 0,
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -1,6 +1,11 @@
+-from flask import Blueprint, render_template, request, jsonify
++from flask import Blueprint, render_template, request, jsonify, session
+ from models.core_models import PerguntaDinamica
+ from middlewares.auth import auth_required
++from extensions import db
++from sqlalchemy import text
++from datetime import datetime
++import json
++import ast
+ 
+ client_form = Blueprint('client_form', __name__)
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -125,7 +125,7 @@
+     
+     # Query registros
+     sql_reg = """
+-        SELECT r.dados_json, r.id_protocolo, r.ano, sp.nome as status_nome, sp.cor_badge, r.status_id_fk
++        SELECT r.dados_json, r.id_protocolo, r.ano, sp.nome as status_nome, sp.cor_badge, r.status_id_fk, r.municipio_id_fk
+         FROM registros r
+         LEFT JOIN status_processos sp ON r.status_id_fk = sp.id
+         WHERE r.id = :id
+@@ -134,7 +134,7 @@
+     is_migrado = False
+     if not res:
+         sql_mig = """
+-            SELECT pm.dados_json, pm.id_protocolo, pm.ano, sp.nome as status_nome, sp.cor_badge, pm.status_id_fk
++            SELECT pm.dados_json, pm.id_protocolo, pm.ano, sp.nome as status_nome, sp.cor_badge, pm.status_id_fk, pm.municipio_id_fk
+             FROM processos_migrados pm
+<truncated 346 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -170,6 +170,7 @@
+             'status_nome': status_nome,
+             'cor_badge': cor_badge,
+             'status_id_fk': status_id_fk,
++            'municipio_id': res[6],
+             'is_migrado': is_migrado
+         }
+     })
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -291,7 +291,7 @@
+ 
+         # Totais de Status (para o painel de filtros no topo)
+         sql_totais = f"""
+-            SELECT s.id, s.nome, s.cor_badge, COUNT(todos.id) as total, s.ordem_cliente, s.tipo, s.filtro_config
++            SELECT s.id, s.nome, s.cor_badge, COUNT(todos.id) as total, s.ordem_cliente, s.tipo, s.filtro_config, s.visibilidade
+             FROM status_processos s
+             LEFT JOIN (
+                 SELECT id, status_id_fk FROM processos_migrados {filtro_totais_pm}
+@@ -298,7 +298,7 @@
+                 SELECT id, status_id_fk FROM registros {filtro_totais_r}
+             ) todos ON todos.status_id_fk = s.id
+             WHERE s.status = 'ativo'
+-            GROUP BY s.id, s.nome, s.cor_badge, s.ordem_cliente, s.tipo, s.filtro_config
+<truncated 434 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -311,11 +311,16 @@
+         # Mapeamento auxiliar para soma de filtros
+         counts_by_name = {row[1]: row[3] for row in rows_totais if row[5] == 'form'}
+         
++        # ── Resgate de Todos os Status para mapeamento de Filtros (Pilar 1 - Final Fix) ──
++        all_status_rows = db.session.execute(text("SELECT id, nome FROM status_processos")).fetchall()
++        id_to_name_map = {str(r[0]): clean_str(r[1]) for r in all_status_rows}
++        name_to_id_map = {clean_str(r[1]).lower().strip(): str(r[0]) for r in all_status_rows}
++
+         import json
+         for row in rows_totais:
+-            st_id = row[0]
+-            st_nome = row[1]
+-            st_cor = row[2]
++            st_id = str(row[0])
++            st_nome = clean_str(row[1])
++            st_cor = row[2] or '#3b82f6'
+<truncated 2657 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -376,7 +376,9 @@
+         except Exception as e:
+             print("Aviso: Falha ao carregar IDs de objeto:", e)
+ 
+-        # Lista de Processos (com JOIN em municipios para pegar o nome)
++        # ── 2. Lista de Processos (com JOIN em municipios para pegar o nome) ──────
++        sort_order = request.args.get('sort', 'desc') # desc = mais recentes, asc = mais antigos
++        order_by = 'data_criacao DESC' if sort_order == 'desc' else 'data_criacao ASC'
+         
+         sql_processos = f"""
+             SELECT
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -396,7 +396,7 @@
+             UNION ALL
+             
+             SELECT
+-                r.id, r.ano, COALESCE(r.data_modificacao, r.data_envio) AS data_criacao, CAST(r.id_protocolo AS CHAR) AS protocolo,
++                r.id, r.ano, r.data_envio AS data_criacao, CAST(r.id_protocolo AS CHAR) AS protocolo,
+                 r.dados_json, r.status_id_fk, r.municipio_id_fk,
+                 m.nome AS nome_municipio,
+                 s.nome AS nome_status, s.cor_badge AS cor_status,
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -407,8 +407,8 @@
+             LEFT JOIN status_processos s ON s.id = r.status_id_fk
+             WHERE 1=1 {filtro_mun_r}
+             
+-            ORDER BY id DESC
+-            LIMIT 500
++            ORDER BY {order_by}
++            LIMIT 2000
+         """
+         params = {}
+         if municipio_id_filtro:
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -420,50 +420,83 @@
+             dados = row[4]
+             if isinstance(dados, str):
+                 try:
+-                    dados = __import__('json').loads(dados)
+-                except Exception:
++                    import json
++                    dados = json.loads(dados)
++                except:
+                     dados = {}
+ 
+-            # Extrai descrição do objeto do JSON legado
+-            objeto_desc = dados.get('objeto') or dados.get('Objeto') or dados.get('object')
+-            
+-            # Fallback inteligente: buscar pelos IDs reais da tabela de perguntas caso não ache a chave "objeto"
+-            if not objeto_desc:
++            # ── Resgate Dinâmico de IDs de Pergunta para "Objeto" ──────
++            perguntas_objeto_ids = []
++            try:
+<truncated 5283 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -852,7 +852,16 @@
+         except:
+             pass
+ 
+-        # 2. Fallback para o JWT Token ou Sessão
++        # 2. Tentar pegar do Smart Selector da LicitaPro
++        if not municipio_id:
++            sel_id = session.get('selected_municipio_id')
++            if sel_id and sel_id != 'all':
++                try:
++                    municipio_id = int(sel_id)
++                except:
++                    pass
++
++        # 3. Fallback para o JWT Token ou Sessão
+         if not municipio_id:
+             token = session.get('jwt_token')
+             if token:
+[diff_block_end]
+
+<truncated 227 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -882,9 +882,8 @@
+                     municipio_id = int(fallback_mun)
+ 
+         if not municipio_id:
+-            # FIX DE SEGURANÇA: NUNCA associar a 1 silenciosamente em prod. 
+-            # Como é uma falha grave de tenant, devemos travar no 0 para estourar erro de FK
+-            # ou usar o fallback apenas para DEV local
++            # Se ainda assim for 0, e for admin, talvez queira salvar em um 'global' (0)
++            # Mas para garantir visibilidade, vamos manter o 0 e logar.
+             municipio_id = 0
+ 
+         if processo_id:
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -6,13 +6,36 @@
+ from datetime import datetime
+ import json
+ import ast
++import os
++import uuid
++import jwt
++import threading
++import requests
+ 
+ client_form = Blueprint('client_form', __name__)
+ 
++def hex_to_rgb(hex_str):
++    """Converte hexadecimal para string RGB (ex: #3b82f6 -> 59, 130, 246)"""
++    if not hex_str or not hex_str.startswith('#'):
++        return "59, 130, 246"
++    try:
++        hex_str = hex_str.lstrip('#')
++        lv = len(hex_str)
++        rgb = tuple(int(hex_str[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
++        return f"{rgb[0]}, {rgb[1]}, {rgb[2]}"
++    except:
++        return "59, 130, 246"
++
++def clean_str(s):
++    """Limpa strings para evitar problemas de encoding (latin1 -> utf8)"""
++    if not isinstance(s, str): return s
++    try:
+<truncated 20281 bytes>
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -136,9 +136,7 @@
+             LEFT JOIN municipios m ON m.id = pm.municipio_id_fk
+             LEFT JOIN status_processos s ON s.id = pm.status_id_fk
+             WHERE {where_pm}
+-            
+             UNION ALL
+-            
+             SELECT
+                 r.id, r.ano, r.data_envio AS data_criacao, CAST(r.id_protocolo AS CHAR) AS protocolo,
+                 r.dados_json, r.status_id_fk, r.municipio_id_fk,
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+The following changes were made by the USER to: C:\Robos\TRPROC\routes\client_form.py. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -148,14 +148,9 @@
+             LEFT JOIN municipios m ON m.id = r.municipio_id_fk
+             LEFT JOIN status_processos s ON s.id = r.status_id_fk
+             WHERE {where_r}
+-            
+             ORDER BY data_criacao DESC
+             LIMIT 2000
+         """
+-        params = {}
+-        if municipio_id_filtro:
+-            params['mun_id'] = municipio_id_filtro
+-
+         rows = db.session.execute(text(sql_processos), params).fetchall()
+ 
+         for row in rows:
+@@ -162,15 +162,10 @@
+                 dados = row[4]
+                 if isinstance(dados, str):
+-                    try:
+-                        dados = json.loads(dados)
+-                    except:
+-                        dados = {}
+-
+-                # ── Extração Inteligente do Objeto ──────
+<truncated 31186 bytes>
