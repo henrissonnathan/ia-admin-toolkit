@@ -22,8 +22,15 @@ A IA é proibida de implementar ideias otimizadas durante uma tarefa sem autoriz
 
 ## 3. Mapa de Contexto Shorthand (`CONTEXT_MAP.min.txt`)
 O Mapa de Contexto nunca deve ser escrito em texto longo (linguagem humana).
-* **Formatação Restrita:** Deve ser escrito exclusivamente no formato "minificado" (Shorthand / Pseudo-código) que a IA usa no AI_CORE.min.txt.
-* **Objetivo:** Otimização máxima. Quando a IA inicia um novo chat e carrega o mapa, ela gasta o mínimo de tokens possível para entender a arquitetura do projeto atual.
+* **Formatação Restrita:** Deve ser escrito exclusivamente no formato "minificado" (Shorthand / Pseudo-código).
+* **Objetivo:** Otimização máxima ao iniciar a IA.
+
+---
+
+## 4. Histórico de Evolução e Criações (`HISTORY.min.log`)
+O histórico do projeto **não** deve ser um diário de correções de bugs menores ou vírgulas alteradas.
+* **Foco em Evolução:** Ele deve registrar exclusivamente as **criações**, **grandes melhorias**, e as **decisões de arquitetura** (o *porquê* e *como* melhorou).
+* **Objetivo:** Servir como uma base sólida para a IA saber qual é o "próximo nível". A IA deve ler o histórico e pensar: *"Se já fizemos a melhoria X para ficar mais rápido, como posso melhorar o X ainda mais agora?"*
 
 ---
 
