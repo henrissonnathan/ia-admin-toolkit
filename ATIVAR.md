@@ -52,7 +52,9 @@ Depois que o Toolkit estiver ativo, você pode digitar estes atalhos a qualquer 
 
 * **`L.cmd`** ou **`L.ajuda`** ➔ Mostra a lista de atalhos.
 * **`L.lista`** ➔ A IA lista todas as ideias pendentes que ela guardou no Cofre.
-* **`L.aprovar [ID]`** ➔ Manda a IA executar a ideia especificada (ex: *L.aprovar ID-002, mas mude a cor*).
+* **`L.aprovar [ID]`** ➔ Manda a IA executar a ideia especificada (ex: *L.aprovar ID-002*).
+* **`L.combo [ID-1, ID-2]`** ➔ Aprova e planeja múltiplas ideias numa tacada só.
 * **`L.limpo`** ➔ A IA faz a faxina e apaga erros velhos/inválidos do Cofre de Erros.
 * **`L.mapa`** ➔ Força a IA a escanear a arquitetura e atualizar o mapa de contexto minificado.
-* **`L.evoluir [skill]`** ➔ A IA auto-atualiza a documentação da skill com novos padrões que aprendeu para não errar de novo.
+* **`L.evoluir [skill]`** ➔ A IA auto-atualiza a documentação da skill com novos padrões.
+* **`L.zip`** ➔ Compacta o histórico (Ocorre automaticamente se o arquivo ficar muito grande).

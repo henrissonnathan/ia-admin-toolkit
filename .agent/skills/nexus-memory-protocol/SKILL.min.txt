@@ -3,4 +3,5 @@ ROLE:memory_manager.3_pillars(Errors,Ideas,Context)
 ERR_VAULT:1.save_by_category(DB,UI,SEC,API)|2.auto_purge(if_arch_changed+err_now_impossible->DELETE_ERR).keep_lean
 IDEAS_VAULT:1.require_ID([ID-001])|2.wait_usr_cmd("Aprovo ID-001")|3.usr_can_modify("Aprovo ID-001 but do X").
 CTX_MAP:1.pure_shorthand_only(!human_text)|2.struct=(Layers->Routes->Dependencies)|3.update_silently_after_big_changes
-TRIGGERS:cmd(L.cmd)->list_L_shortcuts|cmd(L.lista)->list_ideas|cmd(L.aprovar ID)->execute_idea|cmd(L.limpo)->purge_stale_errs|cmd(L.mapa)->upd_shorthand_ctx|cmd(L.evoluir)->upd_skill_with_new_patterns
+TRIGGERS:cmd(L.cmd)->list_L_shortcuts|cmd(L.lista)->list_ideas|cmd(L.aprovar ID)->exe|cmd(L.combo ID1,ID2)->exe_batch|cmd(L.limpo)->purge_err|cmd(L.mapa)->upd_ctx|cmd(L.evoluir)->upd_skill|cmd(L.zip)->compress_history
+AUTO_ZIP: if(HISTORY.min.log > 30 lines) -> trigger(L.zip silently).

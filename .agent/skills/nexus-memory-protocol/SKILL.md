@@ -32,9 +32,11 @@ Para economizar tempo e padronizar as ações, você pode usar os seguintes atal
 * **`L.cmd`** ➔ Lista todos os comandos rápidos do Toolkit para você não esquecer.
 * **`L.lista`** ➔ A IA lê o `IDEIAS_SUGERIDAS.md` e lista as ideias pendentes com seus IDs.
 * **`L.aprovar [ID-XXX]`** ➔ A IA executa imediatamente a ideia solicitada.
+* **`L.combo [ID-1, ID-2]`** ➔ Aprova e executa múltiplas ideias de uma só vez (Economia de tokens).
 * **`L.limpo`** ➔ A IA faz uma "faxina" no `ERROR_VAULT.md`, apagando erros que já não fazem mais sentido.
 * **`L.mapa`** ➔ A IA relê a estrutura e atualiza o `CONTEXT_MAP.min.txt`.
 * **`L.evoluir [skill]`** ➔ A IA analisa o que aprendeu de novo e atualiza o `SKILL.min.txt` da skill para ela ficar mais inteligente.
+* **`L.zip`** ➔ Compacta o histórico. *(Gatilho Automático: Se o `HISTORY.min.log` passar de 30 linhas, a IA fará o L.zip sozinha).*
 
 ---
 
