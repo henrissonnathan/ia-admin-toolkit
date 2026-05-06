@@ -1,5 +1,0 @@
-[HEALTH:v2:20260506_1053]
-AI_CORE:[MISS]:AI_CORE.min.txt. CRITICAL. req(/smart-init).
-SKILLS:[MISS]:(skills dir)/SKILL.md. CRITICAL.
-TEMPLATES:[MISS]:templates/ERROR_VAULT.md. req(create).|[MISS]:templates/IDEIAS_SUGERIDAS.md. req(create).|[MISS]:templates/HISTORY.min.log. req(create).|[MISS]:templates/CONTEXT_MAP.min.txt. req(create).
-MEMORY:[MISS]:.agent/memory/. req(/smart-init).|[SEC]:.agent/memory/ !in .gitignore. CRITICAL.

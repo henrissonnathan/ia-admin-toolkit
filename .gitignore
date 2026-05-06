@@ -1,0 +1,14 @@
+# Memoria local (privada, nunca sobe para o GitHub)
+.agent/memory/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
