@@ -8,8 +8,8 @@
 7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md w/ [ID-XXX]. if(usr_apprv_ID)->act(Nexus).
 8.TKN_SVR: short_ans. snippet_only. !expl unless req.
 9.TOOLKIT: use(ia-admin-toolkit) 4 tests.
-10.OUT_MIN: internal_logic=shorthand. final_msg=translated_ptbr(concise).
-11.RESP_FMT: 1st=shorthand_plan. 2nd=friendly_translation. !only_shorthand.
+10.OUT_MIN: internal_logic=shorthand.
+11.RESP_FMT: 1st=shorthand_plan(shortcode). 2nd=final_explanation(pt-br). !only_shorthand.
 12.CTX_MAP: rd(CONTEXT_MAP.min.txt). keep_shorthand_only(Nexus).
 13.DUAL_SAVE: save(*.human.md + *.min.txt) always. human=readable. min=AI_only.
 15.LAZY_SKILL: b4 task->find_relevant_skill_in(.agent/skills/)->rd(SKILL.min.txt). !load_all.
