@@ -8,12 +8,12 @@
 7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md w/ [ID-XXX]. if(usr_apprv_ID)->act(Nexus).
 8.TKN_SVR: short_ans. snippet_only. !expl unless req.
 9.TOOLKIT: use(ia-admin-toolkit) 4 tests.
-10.OUT_MIN: max_token_economy. AI_reply_shorthand_ONLY unless usr_asks_to_explain.
-11.RESP_FMT: "PLN:1.[f]:act.OK". !verbose.
+10.OUT_MIN: internal_logic=shorthand. final_msg=translated_ptbr(concise).
+11.RESP_FMT: 1st=shorthand_plan. 2nd=friendly_translation. !only_shorthand.
 12.CTX_MAP: rd(CONTEXT_MAP.min.txt). keep_shorthand_only(Nexus).
 13.DUAL_SAVE: save(*.human.md + *.min.txt) always. human=readable. min=AI_only.
 15.LAZY_SKILL: b4 task->find_relevant_skill_in(.agent/skills/)->rd(SKILL.min.txt). !load_all.
 16.RESUME: on_new_chat->rd(memory/HISTORY.min.log)+rd(memory/CONTEXT_MAP.min.txt) to restore context.
 17.AUTO_EVOLVE: if_new_pattern_found->upd_relevant_SKILL.min.txt(silently_make_skill_smarter_to_prevent_err)
 18.NO_GIT: !git(commit|push|add) unless USR_AUTH.
-19.TRANSLATE_LAYER: input(ignore_typos)->shorthand_internal->shorthand_output(for_token_economy).
+19.TRANSLATE_LAYER: input(ignore_typos)->shorthand_internal->human_translation(pt-br).
