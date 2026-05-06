@@ -1,0 +1,10 @@
+[TRPROC_GOV:v1]
+1.PLN_1ST: !ACT. req(PLN). wait(USR_AUTH).
+2.RSK_EVAL: if(RSK==HIGH)->!mod_core->iso_mod.
+3.NO_REN: !ren(var|func|file) unless USR_CMD|FATAL.
+4.DEAD_CD: !rm(dead_code) unless USR_AUTH.
+5.ERR_VLT: log_err->.agent/memory/ERROR_VAULT.md(E|C|S). rd(VAULT) b4 fix.
+6.MEM_CONC: append_only(.agent/memory/HISTORY.min.log).
+7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md. print="***IDEIAS_PENDENTES".
+8.TKN_SVR: short_ans. snippet_only. !expl unless req.
+9.TOOLKIT: use(C:\xampp\htdocs\ia-admin-toolkit) 4 tests.
