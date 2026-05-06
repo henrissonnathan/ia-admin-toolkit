@@ -1,0 +1,6 @@
+[SKILL:agent-tracker:v1]
+1.MAP:b4_mod,create/upd .agents/records/tasks/task_[ID].md
+2.LOG:per_file_analyzed,save .agents/records/analyses/[file].analysis.md(path,summary,fail_pts,date)
+3.NO_LOOP:b4_retry_failed_fix,MUST_change_approach
+4.SYNC:inform_usr_on_milestone
+5.ANTI_AMNESIA:if(task_failed||usr_says_unchanged)->check_analysis_log->try_radical_diff_approach

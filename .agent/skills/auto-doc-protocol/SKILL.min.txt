@@ -1,0 +1,5 @@
+[SKILL:auto-doc:v1]
+1.README_LOCAL:on_explore/modify_folder->check_README_LOCAL.md.if(!exist)->create
+2.CONTENT:max_3-4_lines.purpose+responsibility_of_folder
+3.UPDATE:if(folder_role_changes||new_modules)->update_README_LOCAL.md
+4.LANG:pt-BR

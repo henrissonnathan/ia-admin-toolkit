@@ -1,0 +1,5 @@
+[SKILL:task-gov:v1]
+1.B4_MOD:check .agents/records/tasks/current_task.md + .agents/records/analysis/
+2.ANALYZE:per_important_file->create/upd .agents/records/analysis/[filename].md(logic,deps,gotchas)
+3.LOG_CHANGES:doc_each_add/remove/fix_in_task_log
+4.!REPEAT:[x]_completed_task=NEVER_redo.if_recurrent->consult_analysis_file(why_prev_fix_failed)

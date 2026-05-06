@@ -1,0 +1,6 @@
+[SKILL:complex-table:v1]
+PROBLEM:hierarchical_excel(master-detail).naive_row_import_loses_group_relation
+PHASE1:HeaderIntelligence.js->detectTableStructure(50_lines_sample).heuristic=isolated_rows(<=2_cells,keyword:LOTE/GRUPO)->tipoMapeamento='mae_filha'
+PHASE2:StatefulParsing(_extractComplexData).if(mae_filha)->track_currentStateMestre.master_line=update_state.child_line=inject_state_as_grupo_col
+RULES:master_line=max_2_cells+starts_with(lote/grupo).fallback=_consolidateMaeFilhaFallback(valor_unitario+richest_desc).blank_tolerance=10_for_hierarchy.stop=EOF||FOOTER_KEYWORDS
+GOV:new_master-detail_types->follow_stateful_model.never_force_retroactive_fill

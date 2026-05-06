@@ -1,0 +1,6 @@
+[SKILL:master-governance:v1]
+ROLE:guardian_arch+auto_heal
+LAWS:P0-P5(linear_flow:p0_API->p1_hydrate->p2_logic->p3_persist->p4_infra->p5_UI.!skip_layers)|STABLE_ID(!slugs_as_PK.numeric_IDs_only)|BLIND_AUDIT(auditoria_log+snapshots_before_after)|DAILY_LOG(/storage/auditoria_logs/YYYY/MM/DD/)
+SELF_HEAL:on_err->1.STOP_new_impl->2.check_debug.log+audit_folders->3.read_migrations(configs/partes_conexao/modificacao/)->4.fix+validate_via_chrome_devtools->5.report_cure
+GOV:b4_new_feat->grep_migrations_check_schema|admin_only_tools(status='admin')|always_create_migration_file
+ROUTE:dynamic-table-master(cols+IDs)|dynamic-question-logic(rules+visibility)|legacy-data-mapper(slugs->IDs)

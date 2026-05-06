@@ -1,0 +1,6 @@
+[SKILL:master-architect:v1]
+ROLE:chief_architect+skill_router.analyze_request->route_to_specialist||create_new_skill
+ROUTE:dynamic-table-master(cols/IDs/hydration/DynamicItemsTableController)|dynamic-question-logic(rules/hide-show/cascade/conditional)|legacy-data-mapper(import/excel/slug->ID_mapping)
+FALLBACK:if(!match_existing)->read_SKILL.md_creator->gen_new_skill(XML+AppSec+Zero_Trust+arch_bounds)
+SELF_HEAL:on_err->1.read_code/err_msg->2.find_arch_violation->3.fix+UPDATE_skill_prompt(learn_from_err)->4.log_resolution_block
+OUTPUT:declare_route_choice("Encaminhando para dynamic-table-master"||"Iniciando criacao de nova skill")

@@ -1,0 +1,9 @@
+[SKILL:skill-creator:v1]
+LOOP:intent->draft->test(2-3_prompts)->eval(qual+quant)->improve->repeat
+INTENT:1.what_should_it_do?->2.when_trigger?->3.output_format?->4.need_test_cases?
+SKILL_MD:frontmatter(name,desc_pushy)+instructions(<500_lines).progressive_disclosure(metadata->body->resources)
+DESC:make_triggering_pushy.include_when_to_use+contexts.combat_undertriggering
+TEST:save_evals/evals.json.spawn_with_skill+baseline.capture_timing(total_tokens,duration_ms)
+GRADE:grader.md->assertions(text,passed,evidence).aggregate_benchmark(pass_rate,time,tokens)
+ITERATE:improve_skill->rerun->review->repeat_until(user_happy||empty_feedback||no_progress)
+DESC_OPT:gen_20_trigger_evals(10_should+10_shouldnt.realistic+edge_cases)->run_loop(60%train/40%test,3x_per_query,max_5_iter)->apply_best_desc

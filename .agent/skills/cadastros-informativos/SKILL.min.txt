@@ -1,0 +1,9 @@
+[SKILL:cadastros-info:v1]
+ARCH:admin_creates_model->admin_adds_fields->municipio_fills->admin_views/exports
+LAYERS:admin(acoes/gerenciar_cadastros_info/,acoes/gerenciar_campos_cadastro_info/)|client(acoes/cadastro_informativo/,public_html/js/cadastro-info/)|pages(paginas/gerenciar_cadastros_info.php,cadastro_informativo.php,listar_cadastros_informativos.php)
+DB:cadastros_informativos(models)|cadastros_informativos_campos(fields)|cadastros_informativos_opcoes(select_opts)|cadastros_informativos_dados(saved_data.key=id_cadastro+id_entidade_alvo+id_campo.UPSERT)
+AUX_TABLES:regras_condicionais_cad_info,condicoes_de_regra_cad_info.MAY_NOT_EXIST_LOCAL->try/catch+empty_array
+TYPES:texto|numero|area_texto|data|caixa_selecao_unica|caixa_box_unica|caixa_box_multipla|caixa_selecao_multipla|card_dinamico
+SERIAL:simple=str|multi=JSON_array|card=JSON_obj
+LAWS:1.JSON_resp(status:'s'/'n')|2.ob_start+ob_end_clean+json_encode|3.POST_fallback($_POST||php://input)|4.try/catch_aux_tables|5.handler=[['status'=>'admin','nivel'=>1]]|6.!duplicate_files(_cadastro.php)
+JS:main.js(ctrl)|ui.js(render)|events.js(handlers).dep=api.js

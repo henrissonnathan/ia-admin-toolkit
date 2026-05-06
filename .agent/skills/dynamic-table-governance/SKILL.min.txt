@@ -1,0 +1,9 @@
+[SKILL:dyn-table-gov:v1]
+CORE:single_engine.all_table_types_share_render+persist+config
+1.ID_SOV:data_bound_to_coluna_db_id(numeric).slugs=UI_display_only
+2.ENGINE_UNIFY:!create_specialized_editors.extend_ColumnTemplate+TableConfigModule
+3.CASCADE_PERSIST:respostas_tabela[]->relational_schema(salvar.php)
+4.IDEMPOTENT_SQL:check_existing_keys/cols_b4_alter
+FE:column-template.js(col_defs)|papel_coluna(semantic_roles)|formulas(slug->ID_on_save)
+BE:saveHandlers.js(isTable_check)|salvar.php(process_respostas_tabela)
+NEW_TYPE:1.add_to_isTable(modalHandlers+saveHandlers)->2.update_column-template->3.ensure_salvar.php_recognizes->4.update_this_skill

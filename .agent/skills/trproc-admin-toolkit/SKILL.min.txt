@@ -1,0 +1,9 @@
+[SKILL:trproc-admin-tk:v1]
+WHEN:integrity_audit|CRUD_test|orphan_cleanup|db_diagnostic|post_migration_stability
+SCRIPTS:.agents/skills/trproc-admin-toolkit/scripts/
+1.test_crud_completo.py(sim_fill+delete_all_question_types)
+2.ast_scanner.py(static_analysis:vuln+obsolete_patterns)
+3.db_schema_mini.py(SQL_schema_conformity)
+4.auto_tester.py(E2E_motor)
+5.setup_portability.py(reconfigure_local_paths_after_clone)
+WORKFLOW:1.if_instability->run_test_crud->2.b4_refactor->run_ast_scanner->3.always->gen_report(status,tool,diagnostic,corrections)

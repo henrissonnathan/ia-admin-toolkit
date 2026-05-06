@@ -1,0 +1,7 @@
+[SKILL:arq-form-ref:v1]
+ARCH:monolith_modular.BE_strict_sep_FE.RESTful_stateless
+FLOW:p0(Gateway:HTTP,JWT,json_validate,filter_var,!DB)->p1(AppSvc:orchestrate,!HTTP,!SQL,legacy_transition)->p2(Domain:biz_rules,exceptions)->p3(Repo:PDO,prepared_stmt,WHERE+municipio_id_fk)->p4(Infra:drivers)->p5(CrossCut:logs,telemetry)
+SEC:zero_trust(NIST800-207).municipio_id_fk=FROM_JWT_ONLY.IDOR=WHERE_id+municipio_id_fk.!concat_SQL.PDO_bindValue_typed.!leak_stacktrace.p0_catch_all->JSON_generic+log_p5
+DATA:stable_identity(IDs>slugs).legacy_transition(Load-Legacy-Save-Modern)@p1.LegacyDataMapper@p3
+CODE:declare(strict_types=1).layer_comment_top.PascalCase_class.camelCase_method.snake_case_db
+ABORT:if(violate_p0p5||!tenant_filter||!typed_PDO)->CRITICAL_ABORT(reason,correction_path)

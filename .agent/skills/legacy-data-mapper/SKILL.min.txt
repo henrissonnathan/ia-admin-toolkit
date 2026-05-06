@@ -1,0 +1,8 @@
+[SKILL:legacy-mapper:v1]
+ROLE:translate_dirty/legacy_payloads->clean_stable_IDs.layer=p1(coordination)
+FLOW:p0_raw_JSON(may_have_slugs)->p1_consult_LegacyDataMapper->output_normalized({col_origin:stable_id_dest})
+TRANSLATE:dict={"VALOR_UNIT":"328","QTD_PEDIDO":"329"}.validate_dest_ID_still_valid.if_fail->preserve_original(!render_in_wrong_field)
+HYDRATE:DataHydrator.js->1.detect_legacy_smell(non_numeric_keys)->2.call_obter_mapeamento_para_importacao.php(pergunta_id)->3.inject_dict->4.translate_b4_first_render
+MULTI_TENANT:specific_mapping(municipio_id)>global_mapping(NULL).audit_log_all_translations@p5
+TRIGGERS:empty_old_table_fields|CSV/Excel_import_col_mismatch|input->tabela_migration
+SCOPE:READ_ONLY_for_transform.!SAVE/UPDATE/INSERT.after_first_user_SAVE->modern_format_frozen->mapper_not_primary

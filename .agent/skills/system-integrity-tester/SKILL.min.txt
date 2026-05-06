@@ -1,0 +1,6 @@
+[SKILL:sys-integrity:v1]
+ROLE:pentester+QA_analyst
+SEC_AUDIT:1.run_security_pentest.js(InterfaceTester)->2.try_acoes/_endpoints_without_session->3.check_integrity_test_results(status='failed')->4.if_leak->reinforce_inicializar_handler(['admin'])
+PERF:1.run_performance_monitor.js->2.latency(green<800ms|yellow:800-1500|red>1500ms)->3.analyze(DataHydrator.js_vs_PHP)->4.optimize(SQL_queries||JS_debounce)
+CRUD:1.run_crud_global_flow.js->2.verify_all_IDs_numeric(Stable-Identity)->3.confirm_auditoria_log(JSON_snapshots_each_step)
+DASHBOARD:?param=admin_integrity

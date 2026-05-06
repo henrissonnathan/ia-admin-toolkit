@@ -1,0 +1,8 @@
+[SKILL:dyn-form-orch:v1]
+CARDS:on_multiselect->gen_card_per_unit(sub_fields:gestor_nome_{unit_id}).autocomplete_on_dynamic_fields
+SAVE:tables=JSON_to_stable_IDs|answers=slug/fieldID|responsaveis=relational_aux_tables(N:1)
+HYDRATE:1.load_cols_from_db->2.fetch_simple_answers->3.async_fetch_complex(gestores/fiscais)
+MULTI_PAGE:visibility_rules_work_cross_page.hidden_required_fields=!block_submit
+UX:loader_while_fetching|block_save_if(unit_selected+gestor_empty)
+MULTI_MUNICIPIO:if(!cols_for_current_mun)->import_template_from_origin_mun.LegacyDataMapper_sync_IDs
+HYDRATE_SOV:1.check_modern(respostas_dinamicas_salvas)->2.if_empty->LegacyDataMapper->3.after_first_save->freeze_to_modern

@@ -1,0 +1,7 @@
+[SKILL:arq-segura-php:v1]
+ARCH:monolith_modular.zero_trust(NIST800-207).straight_line_dep
+LAYERS:p0(Gateway:HTTP+JWT+json_validate+sanitize)|p1(Svc:use_cases+tx)|p2(Domain:biz_rules+invariants)|p3(Repo:PDO_only.SQL_isolation)|p4(Infra:drivers)|p5(CrossCut:logs+telemetry)
+ANTI:p0->p3(!direct_db)|p2->(!HTTP_handling)|p3->(!biz_logic)
+PHP_LAWS:1.declare(strict_types=1)|2.json_validate()@p0_b4_decode|3.filter_var()+htmlspecialchars()@render|4.PDO_prepared+bindValue(PARAM_INT/STR/BOOL).!concat_SQL|5.JWT_only_auth(stateless)
+UNBREAKABLE:IDOR(A01)=municipio_id_fk_FROM_JWT.never_trust_client_id.WHERE_id+tenant|FAIL_CLOSED(A10)=!leak_stacktrace.catch@p0->log@p5->generic_JSON
+ABORT:if(violate)->CRITICAL_ABORT{reason,correction_path}

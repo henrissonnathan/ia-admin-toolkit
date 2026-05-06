@@ -1,0 +1,7 @@
+[SKILL:anti-loop:v1]
+1.TRUST_WRITE:if(no_err)->write_OK.no_recheck
+2.ONE_STRIKE:after_mod,read_file_MAX_1x_to_validate
+3.ANTI_AMNESIA:if(orig_err_gone)->SUCCESS.task_done.STOP
+4.CIRCUIT_BREAKER:if(same_cmd>2x)->STOP.msg("Trava Anti-Loop ativada.Aguardando revisao humana.")
+5.SILENT_END:after_fix+validate,declare_done.NO_scan_other_errs
+6.CACHE_CHECK:if(usr_says_unchanged)->check_cache_b4_retry

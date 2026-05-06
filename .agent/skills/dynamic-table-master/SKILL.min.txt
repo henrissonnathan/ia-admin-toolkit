@@ -1,0 +1,7 @@
+[SKILL:dyn-table-master:v1]
+ARCH:p0(validate_pergunta_id+municipio_id_fk_via_JWT+json_validate)->p1(UPSERT_struct+LegacyDataMapper_sync)->p2(invariants:min_1_col+!circular_formulas)->p3(UPSERT_resilient:INSERT_ON_DUP_KEY_UPDATE.!DELETE_FROM_colunas_WHERE_pergunta_id)->p4(PDO+atomic_tx)
+STABLE_ID:id=sacred_linker.slug=volatile_label.rename=update_slug+nome_only.data_intact.formulas={ID}*{ID}.FE_translates_to_slugs_for_display
+DB_FIRST:!assume_structure_from_static_files.always_call_buscar_colunas_tabela.php?pergunta_id=X.DynamicItemsTableController_loads_from_API
+LEGACY:detect_non_numeric_keys->call_obter_mapeamento_para_importacao.php->inject_dict->translate_b4_render.if(!mapping+!ID)->isolate_as_orphan.!delete_original
+SELF_CHECK:b4_mod_SQL->verify:municipio_id_fk_in_WHERE?+prepared_stmt_typed?+IDs_preserved(!truncate)?
+!VIOLATE:slug_as_PK->CRITICAL_HYDRATION_FAILURE

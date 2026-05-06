@@ -1,0 +1,5 @@
+[SKILL:new-form-arch:v1]
+PRINCIPLE:ignore_col_names.trust_roles_only
+FLOW:1.HeaderIntelligence.js->detect_roles_by_index({0:'item',3:'descricao',4:'quantidade'})->2.AdminMapping->lookup_DB_colunas(role->field_ID)->3.DOM_inject_via_data-column-id(tr.querySelector('[data-column-id="3"]'))->4.trigger_reactivity($(input).val(v).trigger("input").trigger("change").trigger("keyup"))
+SANITIZE:clearTable(true)_b4_inject(!ghost_row_id0)|monetary_roles(valor_unitario,quantidade,valor_total)->extract_digits+comma+dot_only
+!RESTORE:headName_logic.mapping=Index->Role->ID.ALWAYS

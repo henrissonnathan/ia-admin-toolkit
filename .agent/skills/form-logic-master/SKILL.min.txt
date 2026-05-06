@@ -1,0 +1,6 @@
+[SKILL:form-logic:v1]
+RULES_ENGINE:hide/show_by_stable_ID(!slug).resilient_to_slug_rename.supports_type_change(!lose_rules)
+DB_FILTERS:field_opts_from_SQL/API|cascade(state->city.if_1_opt->auto_select+fire_next)|suggestions(text+db_but_free_type)
+TABLE_LOGIC:hide_cols_by_condition(external/internal)|alerts(Swal.fire)_if_val>limit
+MANAGER:no_code_rules("If[A]=[X]->Hide[B]").!delete_rules_on_edit(unless_explicit)
+ANTI_BUGS:!loop_rules(A_hides_B+B_hides_A)|hidden_required=!block_submit

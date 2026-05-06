@@ -1,0 +1,6 @@
+[SKILL:db-perf:v1]
+1.!QUERY_IN_LOOP:!INSERT/UPDATE_inside_foreach/while.USE=bulk_INSERT_ON_DUPLICATE_KEY_UPDATE(chunks_1000)
+2.DB_STREAMING:!load_all_to_array.USE=generators(yield)+MYSQL_ATTR_USE_BUFFERED_QUERY=false
+3.SSP:!client_load_all.USE=serverSide:true(DataTables)+LIMIT+OFFSET_in_SQL
+4.CONN:host=127.0.0.1(!localhost.avoid_IPv6_DNS_latency)
+5.TX:if(>2_tables||bulk_data)->beginTransaction()+commit()
