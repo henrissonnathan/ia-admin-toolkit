@@ -22,6 +22,16 @@ Depois rode: py ./.agent/scripts/health_check.py
 Reporte o resultado.
 ```
 
+### Alternativa: Agente Autônomo (Zero-Setup)
+Se a IA possuir terminal e Git (como o Antigravity), você não precisa clonar manualmente. Apenas cole:
+
+```text
+Ative suas regras de segurança. Para isso:
+1. Clone o repositório 'https://github.com/henrissonnathan/ia-admin-toolkit.git' para uma pasta temp, copie o diretório `.agent` para a raiz deste projeto e apague a pasta temp.
+2. Leia ./.agent/AI_CORE.min.txt e aplique as regras estritamente.
+3. Execute `py ./.agent/scripts/health_check.py --project-path "."` para validar.
+```
+
 **Pronto.** A IA agora está configurada com todas as regras de segurança e economia.
 
 ---

@@ -27,12 +27,18 @@ Regras: ./.agent/AI_CORE.min.txt
 Comando: Execute a regra 16 (RESUME) lendo o HISTORY.min.log e CONTEXT_MAP.min.txt para recuperar o contexto de onde paramos.
 ```
 
-## Versão para Outro PC (Caminho genérico)
+## Versão para Agente Autônomo (Zero-Setup via Git)
 
+Use esta versão se a IA tiver acesso a terminal e git (ex: Claude 3.5 Sonnet / Antigravity). Ela vai baixar as regras sozinha:
+
+```text
+Ative suas regras de segurança. Para isso:
+1. Clone o repositório 'https://github.com/henrissonnathan/ia-admin-toolkit.git' para uma pasta temporária, copie o diretório `.agent` para a raiz deste projeto e apague a pasta temporária.
+2. Leia ./.agent/AI_CORE.min.txt e aplique as regras estritamente.
+3. Execute `py ./.agent/scripts/health_check.py --project-path "."` para validar o sistema.
 ```
-Leia o AI_CORE.min.txt do repositório ia-admin-toolkit e siga estritamente todas as regras.
-Rode o health_check.py para verificar o estado do sistema.
-```
+
+---
 
 ---
 
