@@ -169,7 +169,7 @@ Cada skill tem **2 versões**: `SKILL.md` (👤 para você ler) e `SKILL.min.txt
 SKILL.md (👤 Humano)              SKILL.min.txt (🤖 IA)
 ┌─────────────────────┐           ┌─────────────────────┐
 │ 232 linhas          │           │ 8 linhas            │
-│ Tabelas, exemplos   │    →→→   │ Shorthand compacto  │
+│ Tabelas, exemplos   │    →→→    │ Shorthand compacto  │
 │ Explicações claras  │           │ ~50 tokens          │
 │ ~1500 tokens        │           │ Mesma informação    │
 └─────────────────────┘           └─────────────────────┘
