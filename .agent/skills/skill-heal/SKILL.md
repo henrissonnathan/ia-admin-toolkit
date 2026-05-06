@@ -42,5 +42,18 @@ A IA está ESTRITAMENTE PROIBIDA de renomear variáveis, funções ou IDs que el
 ## 7. Proteção de Código Morto (Dead-Code Rule)
 A IA deve evitar escrever código morto (inútil). Porém, **É PROIBIDO APAGAR CÓDIGO MORTO ANTIGO**. A exclusão de qualquer código legado ou morto só pode ser feita se a IA sugerir no planejamento e o Admin **autorizar expressamente** a exclusão.
 
+## 8. Motor de Tradução de Erros (Error Translation Engine)
+Todo erro detectado ou resolvido deve ser registrado em **formato dual**:
+- **Humano:** Texto legível explicando o problema e a correção.
+- **IA (minificado):** Código compacto que a IA lê com custo mínimo de tokens.
+- **Níveis:** `OK` (✅) | `WARN` (⚠️ aviso, não é erro real) | `ERR` (❌ erro crítico) | `INFO` (ℹ️).
+- O motor vive em `.agent/scripts/health_check.py` e pode ser rodado a qualquer momento.
+
+## 9. Health Check Automático (Boot Sequence)
+- **Comando:** `python .agent/scripts/health_check.py [--project-path C:\caminho]`
+- **O que faz:** Verifica AI_CORE, todas as skills (formato dual), templates de memória, e segurança (.gitignore).
+- **Saída:** Relatório visual no terminal + salvamento dual em `.agent/memory/HEALTH_REPORT.human.md` e `HEALTH_REPORT.min.txt`.
+- **Quando rodar:** Automaticamente no `/smart-init` ou manualmente antes de começar a trabalhar.
+
 > [!CAUTION]
 > NUNCA mude código sem enviar o plano de Risco primeiro. NUNCA execute ideias sem a ordem do usuário. NUNCA renomeie variáveis sem permissão. Sempre use `***IDEIAS_PENDENTES` para poupar tokens.

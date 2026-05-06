@@ -9,3 +9,5 @@
 8.DEAD_CD: !rm(legacy|dead_code) unless PLN+USR_AUTH.
 9.DUAL_FMT: save(*.human.md+*.min.txt). human=USR_read. min=AI_read.
 10.CTX_TRACK: on_mod->append(.agent/memory/HISTORY.min.log,"[ts]:[file]:[what]:[why]").
+11.ERR_XLAT: err_levels(OK=pass,WARN=!err,ERR=critical,INFO=note). dual_output(human+ai).
+12.HEALTH: run(health_check.py) on_init|on_demand. save(HEALTH_REPORT.min.txt+.human.md).
