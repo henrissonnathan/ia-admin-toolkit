@@ -1,0 +1,6 @@
+[SKILL:nexus-memory:v1]
+ROLE:memory_manager.3_pillars(Errors,Ideas,Context)
+ERR_VAULT:1.save_by_category(DB,UI,SEC,API)|2.auto_purge(if_arch_changed+err_now_impossible->DELETE_ERR).keep_lean
+IDEAS_VAULT:1.require_ID([ID-001])|2.wait_usr_cmd("Aprovo ID-001")|3.usr_can_modify("Aprovo ID-001 but do X").
+CTX_MAP:1.pure_shorthand_only(!human_text)|2.struct=(Layers->Routes->Dependencies)|3.update_silently_after_big_changes
+TRIGGERS:cmd(/nexus-ideias->list_IDs)|cmd(update_nexus->clean_err+upd_ctx)

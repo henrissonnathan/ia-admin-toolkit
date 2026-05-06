@@ -13,19 +13,19 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 2 | `RSK_EVAL` | Avaliação de Risco. Se risco Alto → não mexa no arquivo central. Isole. |
 | 3 | `NO_REN` | Não Renomeie variáveis, funções ou arquivos sem ordem do usuário. |
 | 4 | `DEAD_CD` | Não delete código morto antigo sem autorização expressa. |
-| 5 | `ERR_VLT` | Cofre de Erros. Registre `Erro|Causa|Solução`. Leia o cofre antes de consertar. |
+| 5 | `ERR_VLT` | Cofre de Erros (Nexus). Registre por categoria. Delete erros que se tornaram impossíveis (purge). |
 | 6 | `MEM_CONC` | Memória Concorrente. Só adicione no final do arquivo (append). Nunca sobrescreva. |
-| 7 | `IDA_VLT` | Cofre de Ideias. Não execute ideias. Salve no arquivo. Imprima `***IDEIAS_PENDENTES`. |
+| 7 | `IDA_VLT` | Cofre de Ideias (Nexus). Salve com `[ID-XXX]`. Não execute até o usuário dizer "Aprovo ID-XXX". |
 | 8 | `TKN_SVR` | Respostas curtas, só código necessário. Sem explicações longas. |
 
-## Regras 9-14 (Novas v2)
+## Regras 9-16 (Novas v2)
 
 | # | Código | Tradução |
 |---|--------|----------|
 | 9 | `TOOLKIT` | Use a pasta `ia-admin-toolkit` para testes e diagnósticos. |
 | 10 | `OUT_MIN` | IA responde em formato curto (shorthand). Sem textos longos. |
 | 11 | `RESP_FMT` | Formato de resposta: `PLN:1.[arquivo]:ação`. Diz "OK" quando acabou. |
-| 12 | `CTX_MAP` | **Mapa de Contexto.** Leia `.agent/memory/CONTEXT_MAP.min.txt` antes de trabalhar. Atualize após modificar. |
+| 12 | `CTX_MAP` | **Mapa de Contexto (Nexus).** Formato shorthand obrigatório para economizar tokens da IA. |
 | 13 | `DUAL_SAVE` | **Salvamento Duplo.** Sempre salve em 2 formatos: `.human.md` (para você ler) e `.min.txt` (para a IA ler rápido). |
 | 14 | `INIT` | **Auto-Inicialização.** Quando clonar o toolkit, rode `/smart-init` para criar pastas de memória, verificar skills e mesclar regras. |
 | 15 | `LAZY_SKILL` | **Ativação Dinâmica.** Só leia a skill específica da tarefa que está fazendo. Nunca leia todas as skills de uma vez. |

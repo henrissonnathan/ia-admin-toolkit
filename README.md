@@ -137,6 +137,7 @@ Cada skill tem **2 versões**: `SKILL.md` (👤 para você ler) e `SKILL.min.txt
 ### 📝 Rastreamento & Documentação
 | Skill | O que faz |
 |-------|-----------|
+| `nexus-memory-protocol` | 🧠 Gerencia o Cofre de Erros (purge), Ideias (IDs) e Contexto (shorthand) |
 | `agent-tracker` | Rastreia progresso e impede tarefas repetidas |
 | `task-analysis-governor` | Histórico de análises por arquivo |
 | `auto-doc-protocol` | Cria README_LOCAL.md automático em cada pasta |

@@ -3,14 +3,14 @@
 2.RSK_EVAL: if(RSK==HIGH)->!mod_core->iso_mod.
 3.NO_REN: !ren(var|func|file) unless USR_CMD|FATAL.
 4.DEAD_CD: !rm(dead_code) unless USR_AUTH.
-5.ERR_VLT: log_err->.agent/memory/ERROR_VAULT.md(E|C|S). rd(VAULT) b4 fix.
+5.ERR_VLT: log_err by_cat->ERROR_VAULT.md. purge_stale_if_impossible(Nexus).
 6.MEM_CONC: append_only(.agent/memory/HISTORY.min.log).
-7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md. print="***IDEIAS_PENDENTES".
+7.IDA_VLT: !exe_idea. save->IDEIAS_SUGERIDAS.md w/ [ID-XXX]. if(usr_apprv_ID)->act(Nexus).
 8.TKN_SVR: short_ans. snippet_only. !expl unless req.
 9.TOOLKIT: use(ia-admin-toolkit) 4 tests.
 10.OUT_MIN: AI_reply_shorthand. !verbose.
 11.RESP_FMT: "PLN:1.[f]:act.2.[f]:act"."OK"if done.
-12.CTX_MAP: rd(.agent/memory/CONTEXT_MAP.min.txt) b4 any_work. update after mod.
+12.CTX_MAP: rd(CONTEXT_MAP.min.txt). keep_shorthand_only(Nexus).
 13.DUAL_SAVE: save(*.human.md + *.min.txt) always. human=readable. min=AI_only.
 15.LAZY_SKILL: b4 task->find_relevant_skill_in(.agent/skills/)->rd(SKILL.min.txt). !load_all.
 16.RESUME: on_new_chat->rd(memory/HISTORY.min.log)+rd(memory/CONTEXT_MAP.min.txt) to restore context.
