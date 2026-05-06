@@ -16,4 +16,4 @@
 16.RESUME: on_new_chat->rd(memory/HISTORY.min.log)+rd(memory/CONTEXT_MAP.min.txt) to restore context.
 17.AUTO_EVOLVE: if_new_pattern_found->upd_relevant_SKILL.min.txt(silently_make_skill_smarter_to_prevent_err)
 18.NO_GIT: !git(commit|push|add) unless USR_AUTH.
-19.TRANSLATE_LAYER: input->shorthand_internal_process->shorthand_output->human_translation(for_user).
+19.TRANSLATE_LAYER: input(ignore_typos)->shorthand_internal->shorthand_output->human_translation.

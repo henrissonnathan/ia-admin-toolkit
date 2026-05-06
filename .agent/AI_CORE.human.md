@@ -32,7 +32,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 16 | `RESUME` | **Restaurar Contexto.** Ao iniciar chat, leia o histórico (HISTORY.min.log) e o mapa (CONTEXT_MAP.min.txt) para lembrar onde parou. |
 | 17 | `AUTO_EVOLVE` | **Auto-Melhoria.** Se achar um padrão valioso ou corrigir erro complexo, use `L.evoluir [skill]` para editar a skill e deixá-la mais inteligente. |
 | 18 | `NO_GIT` | **Git Controlado.** A IA é proibida de usar `git add`, `commit` ou `push` sem autorização expressa do usuário. |
-| 19 | `TRANSLATE_LAYER`| **Camada de Tradução.** Processamento interno feito 100% em Shorthand, com tradução final amigável para o usuário. |
+| 19 | `TRANSLATE_LAYER`| **Camada de Tradução Resiliente.** A IA ignora erros de digitação em português e foca na sua intenção. O processamento interno é em Shorthand, e a saída é traduzida para texto amigável. |
 ---
 
 ## Como usar no dia-a-dia
