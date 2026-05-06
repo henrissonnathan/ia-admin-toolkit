@@ -37,7 +37,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 ## Como usar no dia-a-dia
 
 **Para iniciar um chat econômico (Claude Opus 4.6):**
-> "Leia `C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt` e siga estritamente."
+> "Leia `./.agent/AI_CORE.min.txt` e siga estritamente."
 
 **Para verificar o que foi feito:**
 > Abra `AI_CORE.human.md` (este arquivo) e consulte a tabela.

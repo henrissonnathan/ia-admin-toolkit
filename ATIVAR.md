@@ -7,9 +7,9 @@ Cole **UMA** destas mensagens no início de qualquer chat novo com a IA para ati
 ## Versão Completa (Recomendada para primeiro uso)
 
 ```
-Leia estritamente o arquivo C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt.
+Leia estritamente o arquivo ./.agent/AI_CORE.min.txt.
 Estas são suas regras obrigatórias para esta sessão.
-Depois execute: py C:\xampp\htdocs\ia-admin-toolkit\.agent\scripts\health_check.py --project-path "C:\xampp\htdocs\Formulario_referencial"
+Depois execute: py ./.agent/scripts/health_check.py --project-path "."
 Mostre o resultado resumido do health check.
 A partir de agora, siga as regras do AI_CORE.min.txt em TODAS as suas respostas.
 ```
@@ -17,13 +17,13 @@ A partir de agora, siga as regras do AI_CORE.min.txt em TODAS as suas respostas.
 ## Versão Curta (Para chats rápidos)
 
 ```
-Regras: C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt — siga estritamente.
+Leia o arquivo ./.agent/AI_CORE.min.txt e siga estritamente. Ative o Protocolo Nexus. (Se for um chat de continuação, leia o HISTORY.min.log e CONTEXT_MAP.min.txt para restaurar nosso contexto).
 ```
 
 ## Versão para Continuar (Novo Chat no mesmo projeto)
 
 ```text
-Regras: C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt
+Regras: ./.agent/AI_CORE.min.txt
 Comando: Execute a regra 16 (RESUME) lendo o HISTORY.min.log e CONTEXT_MAP.min.txt para recuperar o contexto de onde paramos.
 ```
 

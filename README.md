@@ -17,8 +17,8 @@ git clone https://github.com/henrissonnathan/ia-admin-toolkit.git
 Copie e cole esta mensagem no início de qualquer chat com a IA:
 
 ```
-Leia o arquivo C:\xampp\htdocs\ia-admin-toolkit\.agent\AI_CORE.min.txt e siga estritamente todas as regras. 
-Depois rode: py C:\xampp\htdocs\ia-admin-toolkit\.agent\scripts\health_check.py
+Leia o arquivo ./.agent/AI_CORE.min.txt e siga estritamente todas as regras. 
+Depois rode: py ./.agent/scripts/health_check.py
 Reporte o resultado.
 ```
 
