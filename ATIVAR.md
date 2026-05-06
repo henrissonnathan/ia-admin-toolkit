@@ -44,3 +44,13 @@ Rode o health_check.py para verificar o estado do sistema.
 4. ✅ Ela responde de forma curta e econômica
 5. ✅ Ela consulta o Cofre de Erros antes de consertar qualquer coisa
 6. ✅ Ela salva ideias no Cofre sem executá-las
+
+---
+
+## ⌨️ Comandos Rápidos (Durante o Chat)
+Depois que o Toolkit estiver ativo, você pode digitar estes atalhos a qualquer momento:
+
+* **`L.lista`** ➔ A IA lista todas as ideias pendentes que ela guardou no Cofre.
+* **`L.aprovar [ID]`** ➔ Manda a IA executar a ideia especificada (ex: *L.aprovar ID-002, mas mude a cor*).
+* **`L.limpo`** ➔ A IA faz a faxina e apaga erros velhos/inválidos do Cofre de Erros.
+* **`L.mapa`** ➔ Força a IA a escanear a arquitetura e atualizar o mapa de contexto minificado.

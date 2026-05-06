@@ -27,8 +27,17 @@ O Mapa de Contexto nunca deve ser escrito em texto longo (linguagem humana).
 
 ---
 
+## ⌨️ Comandos Rápidos (Shortcuts)
+Para economizar tempo e padronizar as ações, você pode usar os seguintes atalhos diretamente no chat:
+* **`L.lista`** ➔ A IA lê o `IDEIAS_SUGERIDAS.md` e lista as ideias pendentes com seus IDs.
+* **`L.aprovar [ID-XXX]`** ➔ A IA executa imediatamente a ideia solicitada.
+* **`L.limpo`** ➔ A IA faz uma "faxina" no `ERROR_VAULT.md`, apagando erros que já não fazem mais sentido.
+* **`L.mapa`** ➔ A IA relê a estrutura e atualiza o `CONTEXT_MAP.min.txt`.
+
+---
+
 ### ⚠️ Regras para a IA
-1. Ao atualizar o `ERROR_VAULT`, avalie se os erros anteriores ainda fazem sentido. Delete os irrelevantes.
+1. Ao receber `L.limpo`, avalie se os erros do cofre ainda fazem sentido e delete os irrelevantes.
 2. Toda ideia no `IDEIAS_SUGERIDAS` DEVE ter um prefixo `[ID-XXX]`.
-3. Se o usuário mandar `/nexus-ideias`, liste todas as ideias pendentes com seus IDs.
-4. O `CONTEXT_MAP.min.txt` não pode conter parágrafos, apenas estrutura de dados pura.
+3. Ao receber `L.lista`, liste todas as ideias pendentes com seus IDs.
+4. O `CONTEXT_MAP.min.txt` não pode conter parágrafos, apenas estrutura de dados pura (ativado por `L.mapa`).
