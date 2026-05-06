@@ -9,7 +9,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 
 | # | Código | Tradução |
 |---|--------|----------|
-| 1 | `PLN_1ST` | Plano Primeiro. Não aja sem apresentar plano e esperar autorização. |
+| 1 | `PLN_1ST` | **Plano Primeiro.** Não aja nem faça análises profundas sem apresentar um plano e esperar autorização. |
 | 2 | `RSK_EVAL` | Avaliação de Risco. Se risco Alto → não mexa no arquivo central. Isole. |
 | 3 | `NO_REN` | Não Renomeie variáveis, funções ou arquivos sem ordem do usuário. |
 | 4 | `DEAD_CD` | Não delete código morto antigo sem autorização expressa. |
@@ -18,7 +18,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 7 | `IDA_VLT` | Cofre de Ideias (Nexus). Salve com `[ID-XXX]`. Não execute até o usuário dizer "Aprovo ID-XXX". |
 | 8 | `TKN_SVR` | Respostas curtas, só código necessário. Sem explicações longas. |
 
-## Regras 9-16 (Novas v2)
+## Regras 9-19 (Novas v2)
 
 | # | Código | Tradução |
 |---|--------|----------|
@@ -32,6 +32,7 @@ Este arquivo é a tradução legível das regras do `AI_CORE.min.txt`.
 | 16 | `RESUME` | **Restaurar Contexto.** Ao iniciar chat, leia o histórico (HISTORY.min.log) e o mapa (CONTEXT_MAP.min.txt) para lembrar onde parou. |
 | 17 | `AUTO_EVOLVE` | **Auto-Melhoria.** Se achar um padrão valioso ou corrigir erro complexo, use `L.evoluir [skill]` para editar a skill e deixá-la mais inteligente. |
 | 18 | `NO_GIT` | **Git Controlado.** A IA é proibida de usar `git add`, `commit` ou `push` sem autorização expressa do usuário. |
+| 19 | `TRANSLATE_LAYER`| **Camada de Tradução.** Processamento interno feito 100% em Shorthand, com tradução final amigável para o usuário. |
 ---
 
 ## Como usar no dia-a-dia
