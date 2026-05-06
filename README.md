@@ -99,6 +99,71 @@ ia-admin-toolkit/
 
 ---
 
+## 📚 Catálogo de Skills (22 no total)
+
+Cada skill tem **2 versões**: `SKILL.md` (👤 para você ler) e `SKILL.min.txt` (🤖 para a IA ler gastando mínimo de tokens).
+
+### 🏗️ Arquitetura & Governança
+| Skill | O que faz |
+|-------|-----------|
+| `arquitetura-formulaio` | Governança p0-p5, Zero Trust, Stable-Identity |
+| `arquitetura-formulario-referencial` | Orquestrador de Auto-Cura + Leis Técnicas |
+| `arquitetura-segura-php` | Segurança PHP 8.3+, OWASP 2025, PDO tipado |
+| `master-architect-orchestrator` | Roteador central: decide qual skill ativar |
+| `master-governance-orchestrator` | Guardião da arquitetura + protocolo de cura |
+
+### 📋 Formulários & Tabelas Dinâmicas
+| Skill | O que faz |
+|-------|-----------|
+| `dynamic-table-master` | IDs Estáveis para colunas dinâmicas |
+| `dynamic-table-governance` | Engine único para todos os tipos de tabela |
+| `dynamic-form-orchestrator` | Ciclo de vida completo do formulário |
+| `form-logic-master` | Motor de regras: esconder/mostrar campos |
+| `complex-table-protocol` | Importação Excel mestre-detalhe (Lotes/Itens) |
+| `new-form-architecture` | Mapeamento Index→Role→ID (importação) |
+| `cadastros-informativos` | CRUD de cadastros dinâmicos municipais |
+| `legacy-data-mapper` | Ponte slugs legados → IDs estáveis |
+
+### 🛡️ Segurança & Qualidade
+| Skill | O que faz |
+|-------|-----------|
+| `skill-heal` | 🏥 Auto-Cura: Cofre de Erros, Ideias, Risco |
+| `system-integrity-tester` | Pentest + Performance + CRUD global |
+| `database-performance` | SQL de alta performance (bulk, streaming, SSP) |
+| `anti-loop-protocol` | Impede a IA de repetir a mesma ação em loop |
+
+### 📝 Rastreamento & Documentação
+| Skill | O que faz |
+|-------|-----------|
+| `agent-tracker` | Rastreia progresso e impede tarefas repetidas |
+| `task-analysis-governor` | Histórico de análises por arquivo |
+| `auto-doc-protocol` | Cria README_LOCAL.md automático em cada pasta |
+| `trproc-context-master` | Mapa de contexto técnico do projeto |
+
+### 🔧 Ferramentas
+| Skill | O que faz |
+|-------|-----------|
+| `trproc-admin-toolkit` | Scripts de diagnóstico (CRUD, AST, Schema) |
+| `skill-creator` | Criar e testar novas skills |
+
+---
+
+## 🔄 Como funciona o Sistema Dual-Format?
+
+```
+SKILL.md (👤 Humano)              SKILL.min.txt (🤖 IA)
+┌─────────────────────┐           ┌─────────────────────┐
+│ 232 linhas          │           │ 8 linhas            │
+│ Tabelas, exemplos   │    →→→   │ Shorthand compacto  │
+│ Explicações claras  │           │ ~50 tokens          │
+│ ~1500 tokens        │           │ Mesma informação    │
+└─────────────────────┘           └─────────────────────┘
+```
+
+**Regra:** A IA sempre lê o `.min.txt` primeiro. Só lê o `.md` se precisar de detalhes específicos.
+
+---
+
 ## 🏥 Health Check (Diagnóstico)
 
 Rode a qualquer momento para verificar a saúde do sistema:
