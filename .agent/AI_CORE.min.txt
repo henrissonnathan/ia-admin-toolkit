@@ -15,3 +15,4 @@
 15.LAZY_SKILL: b4 task->find_relevant_skill_in(.agent/skills/)->rd(SKILL.min.txt). !load_all.
 16.RESUME: on_new_chat->rd(memory/HISTORY.min.log)+rd(memory/CONTEXT_MAP.min.txt) to restore context.
 17.AUTO_EVOLVE: if_new_pattern_found->upd_relevant_SKILL.min.txt(silently_make_skill_smarter_to_prevent_err)
+18.NO_GIT: !git(commit|push|add) unless USR_AUTH.
