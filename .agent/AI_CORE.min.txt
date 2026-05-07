@@ -17,3 +17,4 @@
 17.AUTO_EVOLVE: if_new_pattern_found->upd_relevant_SKILL.min.txt(silently_make_skill_smarter_to_prevent_err)
 18.NO_GIT: !git(commit|push|add) unless USR_AUTH.
 19.TRANSLATE_LAYER: input(ignore_typos)->shorthand_internal->human_translation(pt-br).
+20.MEM_OPT_UI: 4_large_texts/plans->use(Artifact_Right_Panel). Keep_chat(Left)=shortcode_only. !bloat_chat_history.
